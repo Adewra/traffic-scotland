@@ -19,7 +19,7 @@ class Client
 
         $currentIncidentsFeed = Feed::make('https://trafficscotland.org/rss/feeds/currentincidents.aspx');
         //$title = $currentIncidentsFeed->title;
-        $incidents = collect($currentIncidentsFeed->items)->map(function ($item, $key) use ($client) {
+        $scrapedInformation = collect($currentIncidentsFeed->items)->map(function ($item, $key) use ($client) {
 
             try {
                 $crawler = $client->request('POST', $item->link, [
@@ -39,6 +39,17 @@ class Client
             }
         });
 
-        return $incidents;
+        $incidents = $scrapedInformation->mapInto(\Adewra\TrafficScotland\Incident::class)
+                                        ->each(function ($incident) {
+                                            $this->attributes['permalink'] = $incident->permalink;
+                                            $this->attributes['latitude'] = 55.8591;
+                                            $this->attributes['longitude'] = 4.2581;
+                                        });
+
+        $incidents->each(function ($incident) {
+            $incident->save();
+        });
+
+        return $incidents->all();
     }
 }

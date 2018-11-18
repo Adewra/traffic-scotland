@@ -9,11 +9,16 @@ class CreateIncidentInformationTable extends Migration
     {
         Schema::create('incidents_information', function(Blueprint $t)
         {
-            $t->increments('id')->unsigned();
+            $t->increments('id')->unsigned()->autoIncrement();
+            $t->unsignedInteger('incident');
             $t->text('location');
             $t->text('direction');
             $t->text('type');
             $t->timestamp('timestamp');
+
+            $t->primary('id');
+            $t->foreign('incident')->references('id')->on('incidents');
+            $t->onDelete('cascade');
             $t->timestamps();
         });
     }

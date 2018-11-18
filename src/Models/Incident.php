@@ -1,13 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: allydewar
- * Date: 14/11/2018
- * Time: 23:21
- */
 
 namespace Adewra\TrafficScotland;
 
+use Carbon\Carbon;
+use GeoJson\Geometry\Point;
 use Illuminate\Database\Eloquent\Model;
 
 class Incident extends Model
@@ -18,7 +14,7 @@ class Incident extends Model
         'title',
         'description',
         'content',
-        'link',
+        'permalink',
         'latitude',
         'longitude',
         'authors',
@@ -27,15 +23,41 @@ class Incident extends Model
     ];
 
     protected $casts = [
-        'authors' => 'array'
+        'authors' => 'array',
+        'latitude' => 'float',
+        'longitude' => 'float'
     ];
 
+    protected $hidden = [
+        'latitude',
+        'longitude'
+    ];
+
+    protected $appends = [
+      'location'
+    ];
 
     protected $dates = [
         'date'
     ];
 
-    public function information() {
-        return $this->hasOne(IncidentInformation::class);
+    public function information()
+    {
+        return $this->hasOne(IncidentInformation::class, 'id','information');
+    }
+
+    public function setDateAttribute($value)
+    {
+        $this->attributes['date'] = Carbon::parse($value);
+    }
+
+    public function setLocationAttribute($value)
+    {
+        $this->attributes['location'] = new Point([$this->latitude, $this->longitude]);
+    }
+
+    public function getLocationAttribute()
+    {
+        return isset($this->attributes['location']) ? $this->attributes['location'] : null;
     }
 }

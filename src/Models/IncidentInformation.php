@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: allydewar
- * Date: 17/11/2018
- * Time: 14:54
- */
 
 namespace Adewra\TrafficScotland;
 
