@@ -26,6 +26,11 @@ class Incident extends Model
         'date'
     ];
 
+    protected $casts = [
+        'authors' => 'array'
+    ];
+
+
     protected $dates = [
         'date'
     ];
