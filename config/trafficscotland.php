@@ -1,12 +1,9 @@
 <?php
-/**
- * User: Ally Dewar
- * Date: 14/11/2018
- * Time: 22:13
- */
+
 return [
-    // ...
-    'trafficscotland' => [
-        'method' => env('TRAFFICSCOTLAND_METHOD','rss'),
-    ]
+
+    /**
+     * Enable or disable the capturing of extended accident details by visiting the permalink.
+     */
+    'capture_extended_data' => env('TRAFFICSCOTLAND_EXT','false'),
 ];

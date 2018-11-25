@@ -13,9 +13,15 @@ use Carbon\Carbon;
 
 class Client
 {
+    private $config = [];
+
+    public function __construct()
+    {
+        $this->config = config('trafficscotland');
+    }
+
     public function currentIncidents()
     {
-
         $client = new \Goutte\Client();
         $client->followRedirects();
 
@@ -23,43 +29,49 @@ class Client
         //$title = $currentIncidentsFeed->title;
         $incidents = collect($currentIncidentsFeed->items)->map(function ($item, $key) use ($client) {
 
-            try {
-                $crawler = $client->request('POST', $item->link, [
-                    'allow_redirects' => true
-                ]);
-                $extendedDetails = collect($crawler->filter('div#incidentdetail table tr')->each(function ($node, $i) {
-                    list($key, $value) = explode(": ", trim(preg_replace('!\s+!', ' ', $node->text())), 2);
-                    return array($key => $value);
-                }))->mapWithKeys(function ($item) {
-                    return [snake_case(key($item)) => $item[key($item)]];
-                });
+            $incident = $item->toArray();
+            $incident['latitude'] = $item->latitude;
+            $incident['longitude'] = $item->longitude;
+            $incident['link'] = $item->link;
 
-                $weatherDetails = collect($crawler->filter('div.bulletin-details table tr')->each(function ($node, $i) {
-                    list($key, $value) = explode(": ", trim(preg_replace('/[ \t]+/', ' ', preg_replace('/\r\n/', '', (preg_replace('/\s*$^\s*/m', "", $node->text()))))), 2);
-                    return array($key => $value);
-                }))->mapWithKeys(function ($item) {
-                    return [snake_case(key($item)) => $item[key($item)]];
-                });
+            if($this->config['capture_extended_data'] == true)
+            {
+                try {
+                    $crawler = $client->request('POST', $item->link, [
+                        'allow_redirects' => true
+                    ]);
+                    $extendedDetails = collect($crawler->filter('div#incidentdetail table tr')->each(function ($node, $i) {
+                        list($key, $value) = explode(": ", trim(preg_replace('!\s+!', ' ', $node->text())), 2);
+                        return array($key => $value);
+                    }))->mapWithKeys(function ($item) {
+                        return [snake_case(key($item)) => $item[key($item)]];
+                    });
 
-                /**
-                 * @todo Add support for Highways England data being distributed within the Description field
-                 *  See the CurrentIncidentsSeeder for an example of this data
-                 */
+                    $weatherDetails = collect($crawler->filter('div.bulletin-details table tr')->each(function ($node, $i) {
+                        list($key, $value) = explode(": ", trim(preg_replace('/[ \t]+/', ' ', preg_replace('/\r\n/', '', (preg_replace('/\s*$^\s*/m', "", $node->text()))))), 2);
+                        return array($key => $value);
+                    }))->mapWithKeys(function ($item) {
+                        return [snake_case(key($item)) => $item[key($item)]];
+                    });
 
-                $incident = $item->toArray();
-                $incident['latitude'] = $item->latitude;
-                $incident['longitude'] = $item->longitude;
-                $incident['link'] = $item->link;
+                    if (isset($extendedDetails)){
+                        $incident['extended_details'] = $extendedDetails->all();
+                        $incident['extended_details']['date'] = Carbon::parse($incident['extended_details']['date'])->toDateString();
+                    }
+                    if (isset($weatherDetails)) $incident['weather_conditions'] = $weatherDetails->all();
 
-                if (isset($extendedDetails)){
-                    $incident['extended_details'] = $extendedDetails->all();
-                    $incident['extended_details']['date'] = Carbon::parse($incident['extended_details']['date'])->toDateString();
+                } catch (\Exception $exception) {
+                    return $incident;
                 }
-                if (isset($weatherDetails)) $incident['weather_conditions'] = $weatherDetails->all();
-                return $incident;
-            } catch (\Exception $exception) {
-                return $item->toArray();
             }
+
+            /**
+             * @todo Add support for Highways England data being distributed within the Description field
+             *  See the CurrentIncidentsSeeder for an example of this data
+             */
+
+            return $incident;
+
         })->mapInto(Incident::class);
 
         $incidents->each(function($incident) {
