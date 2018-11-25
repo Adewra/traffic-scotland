@@ -9,16 +9,25 @@ class CreateIncidentInformationTable extends Migration
     {
         Schema::create('incidents_information', function(Blueprint $t)
         {
-            $t->increments('id')->unsigned()->autoIncrement();
-            $t->unsignedInteger('incident');
-            $t->text('location');
+            $t->bigIncrements('id');
+            $t->unsignedBigInteger('incident');
+
+            $t->string('class');
+            $t->timestamp('timestamp');
+            $t->date('date');
+            $t->string('title');
+            $t->dateTime('start_time');
+            $t->string('location');
             $t->text('direction');
             $t->text('type');
-            $t->timestamp('timestamp');
+            $t->longText('description');
+            $t->string('route_name');
+            $t->string('direction');
+            $t->string('delay');
+            $t->string('diversion');
+            $t->dateTime('expected_duration');
 
-            $t->primary('id');
             $t->foreign('incident')->references('id')->on('incidents');
-            $t->onDelete('cascade');
             $t->timestamps();
         });
     }
