@@ -91,11 +91,12 @@ Features
  Configuration    | Yes
  Views    | No
  Blade Directives    | No
- Commands    | No
- Migrations    | No
+ Commands    | Yes
+ Migrations    | Yes
  Translations    | No
  Middleware    | No
  Events   | No
+ Seeds    | Yes
  
 Examples
 -------- 
