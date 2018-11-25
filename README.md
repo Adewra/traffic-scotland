@@ -33,6 +33,7 @@ composer require adewra/trafficscotland
  5.4.x    | Untested
  5.5.x    | Untested
  5.6.x    | Untested
+ 5.7.x    | Test Build
 
 And add the service provider in `config/app.php`:
 
