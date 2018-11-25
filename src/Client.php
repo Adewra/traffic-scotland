@@ -43,6 +43,7 @@ class Client
 
                 /**
                  * @todo Add support for Highways England data being distributed within the Description field
+                 *  See the CurrentIncidentsSeeder for an example of this data
                  */
 
                 $incident = $item->toArray();
