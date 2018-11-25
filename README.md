@@ -76,6 +76,12 @@ Here is an example configuration:
 ]
 ```
 
+To run our database migrations that allow for storing of the data:
+
+```
+php artisan migrate --path=/packages/adewra/trafficscotland/src/migrations
+```
+
 Features
 -------------
 

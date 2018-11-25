@@ -16,6 +16,16 @@ class TrafficScotlandServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/trafficscotland.php' => config_path('trafficscotland.php')
         ], 'config');
+
+        $this->publishes([
+            __DIR__ . '/Migrations' => $this->app->databasePath() . '/migrations'
+        ], 'migrations');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Console\CurrentIncidentsCommand::class,
+            ]);
+        }
     }
 
     /**
