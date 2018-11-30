@@ -7,6 +7,9 @@
         "arandilopez/laravel-feed-parser": "^0.1.3",
         "weidner/goutte": "^1.0"
     },
+    "require-dev": {
+        "phpunit/phpunit": "4.8.*"
+    },
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
     "authors": [

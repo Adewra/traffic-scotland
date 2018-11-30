@@ -20,6 +20,7 @@ class CreateIncidentTable extends Migration
             $t->dateTime('date');
             $t->json('extended_details')->nullable();
             $t->json('weather_conditions')->nullable();
+            $t->json('weather_conditions2')->nullable();
 
             $t->timestamps();
         });
