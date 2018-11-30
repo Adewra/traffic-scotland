@@ -72,8 +72,8 @@ Here is an example configuration:
 
 ```php
 'trafficscotland' => [
-    'method' => env('TRAFFICSCOTLAND_METHOD','rss'),
-]
+    'scrape_data' => env('TRAFFICSCOTLAND_SCRAPE_DATA', false),
+]]
 ```
 
 To run our database migrations that allow for storing of the data:
@@ -90,8 +90,8 @@ Features
  Configuration    | Yes
  Views    | No
  Blade Directives    | No
- Commands    | No
- Migrations    | No
+ Commands    | Yes
+ Migrations    | Yes
  Translations    | No
  Middleware    | No
  Events   | No
@@ -104,3 +104,7 @@ Examples
  ```php
  $incidents = TrafficScotland::currentIncidents();
  ```
+  ```
+  php artisan trafficscotland:currentincidents
+  ```
+  
