@@ -22,13 +22,17 @@ class Incident extends Model
         'comments',
         'date',
         'extended_details',
-        'weather_conditions'
+        'weather_conditions',
+        'weather_conditions2'
     ];
 
     protected $casts = [
         'authors' => 'array',
         'latitude' => 'float',
-        'longitude' => 'float'
+        'longitude' => 'float',
+        'extended_details' => 'array',
+        'weather_conditions' => 'array',
+        'weather_conditions2' => 'array'
     ];
 
     protected $hidden = [
@@ -52,6 +56,11 @@ class Incident extends Model
     public function weatherConditions()
     {
         return $this->hasOne(IncidentInformation::class, 'id','weather_conditions');
+    }
+
+    public function weatherConditions2()
+    {
+        return $this->hasOne(IncidentInformation::class, 'id','weather_conditions2');
     }
 
     public function setDateAttribute($value)
