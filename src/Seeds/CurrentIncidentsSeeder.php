@@ -32,6 +32,30 @@ class CurrentIncidentsSeeder extends Seeder
             'updated_at' => \Carbon\Carbon::now()
         ]);
 
+        \DB::table('incidents')->insert([
+            'title' => 'A9000 Forth Road Bridge - High winds',
+            'description' => 'Road users are advised to use caution crossing the A90 Forth Road Bridge due to high winds currently affecting driving conditions.',
+            'link' => 'http://tscot.org/01c223503',
+            'latitude' => '55.999703069431',
+            'longitude' => '-3.4041775536689',
+            'date' => '2018-11-29',
+            'weather_conditions' => '{"start_time":"29 Nov 2018 - 17:29","location":"A9000 Forth Road Bridge","type":"High winds","route_name":"A9000","direction":"Northbound & Southbound","description":"Road users are advised to use caution crossing the A90 Forth Road Bridge due to high winds currently affecting driving conditions.","expected_duration":"Unknown"}',
+            'created_at' => \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now()
+        ]);
+
+        \DB::table('incidents')->insert([
+            'title' => 'Grampian - Low temperature',
+            'description' => 'Road users are advised to drive with care due to low temperatures affecting driving conditions on many roads throughout the region.',
+            'link' => 'http://tscot.org/01a9706',
+            'latitude' => '57.163647',
+            'longitude' => '-2.321385',
+            'date' => '2018-11-30',
+            'weather_conditions' => '{"title":"Low Temp - Grampian","start_time":"30 Nov 2018 - 21:11","location":"Grampian","type":"Low temperature","route_name":"All Routes","direction":"Any Direction","description":"Road users are advised to drive with care due to low temperatures affecting driving conditions on many roads throughout the region."}',
+            'created_at' => \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now()
+        ]);
+
         /* Below are two sample items from Highways England incidents with extended details in the description field for testing support later */
         /* Ideally with the information in extended_details rather than  in description. */
         /*

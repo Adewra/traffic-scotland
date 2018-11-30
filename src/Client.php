@@ -28,7 +28,7 @@ class Client
             $incident['longitude'] = $item->longitude;
             $incident['link'] = $item->link;
 
-            if($this->config['capture_extended_data'] == true)
+            if($this->config['scrape_data'] == true)
             {
                 try {
                     $crawler = $client->request('POST', $item->link, [

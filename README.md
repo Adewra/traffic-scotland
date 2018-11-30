@@ -64,7 +64,7 @@ Configuration
 To publish the configuration file run:
 
 ```
-> php artisan vendor:publish
+> php artisan vendor:publish --tag=config --tag=migrations
 ```
 
 This will copy the configuration file to `config/trafficscotland.php`.
@@ -73,8 +73,8 @@ Here is an example configuration:
 
 ```php
 'trafficscotland' => [
-    'method' => env('TRAFFICSCOTLAND_METHOD','rss'),
-]
+    'scrape_data' => env('TRAFFICSCOTLAND_SCRAPE_DATA', false),
+]]
 ```
 
 To run our database migrations that allow for storing of the data:
@@ -105,4 +105,11 @@ Examples
  
  ```php
  $incidents = TrafficScotland::currentIncidents();
+ ```
+ ```
+ php artisan trafficscotland:currentincidents
+ ```
+ ```
+ php artisan tinker
+ >>> Adewra\TrafficScotland\Incident::all();
  ```
