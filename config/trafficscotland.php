@@ -5,5 +5,10 @@ return [
     /**
      * Enable or disable the capturing of extended accident details by visiting the permalink.
      */
-    'capture_extended_data' => env('TRAFFICSCOTLAND_EXT','false'),
+    'scrape_data' => env('TRAFFICSCOTLAND_SCRAPE_DATA','false'),
+
+    /**
+     * Enable or disable the capturing of extended accident details by visiting the permalink.
+     */
+    'scrape_data' => env('TRAFFICSCOTLAND_SCRAPE_DATA','false'),
 ];
