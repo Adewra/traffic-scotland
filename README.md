@@ -107,4 +107,8 @@ Examples
   ```
   php artisan trafficscotland:currentincidents
   ```
+  ```
+  php artisan tinker
+  >>> Adewra\TrafficScotland\Incident::all();
+  ```
   
