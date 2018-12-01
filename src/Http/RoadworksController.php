@@ -5,7 +5,7 @@ namespace Adewra\TrafficScotland\Http;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class CurrentIncidentsController extends Controller
+class RoadworksController extends Controller
 {
     /**
      * @var \Adewra\TrafficScotland\Client $client      An instance of the client executing the requests
@@ -25,7 +25,7 @@ class CurrentIncidentsController extends Controller
      */
     public function index()
     {
-        return $this->client->currentIncidents();
+        return $this->client->roadworks(true, true);
     }
 
     /**

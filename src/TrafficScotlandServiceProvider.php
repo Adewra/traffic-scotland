@@ -21,9 +21,14 @@ class TrafficScotlandServiceProvider extends ServiceProvider
             __DIR__ . '/Migrations' => $this->app->databasePath() . '/migrations'
         ], 'migrations');
 
+        $this->publishes([
+            __DIR__ . '/Seeds' => $this->app->databasePath() . '/seeds'
+        ], 'seeds');
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Console\CurrentIncidentsCommand::class,
+                Console\RoadworksCommand::class
             ]);
         }
     }
