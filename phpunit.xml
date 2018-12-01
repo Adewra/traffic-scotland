@@ -14,7 +14,7 @@
         <env name="DB_DATABASE" value="'./storage/database.sqlite'"/>
     </php>
     <testsuites>
-        <testsuite name="Package Test Suite">
+        <testsuite name="TrafficScotland Test Suite">
             <directory suffix="Test.php">./tests/</directory>
         </testsuite>
     </testsuites>
