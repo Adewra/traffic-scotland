@@ -53,7 +53,9 @@ Package hasn't been baselined yet.
 Testing
 -------
 
-Test's haven't been written yet.
+```
+./vendor/bin/phpunit
+```
 
 Configuration
 -------------

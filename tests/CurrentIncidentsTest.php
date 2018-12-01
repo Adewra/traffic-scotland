@@ -1,16 +1,20 @@
 <?php
 
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+namespace Adewra\TrafficScotland\Test;
 
-use PHPUnit\Framework\TestCase;
+use Adewra\TrafficScotland;
 
 class CurrentIncidentsTest extends TestCase
 {
-    public function setUp()
+    /**
+     * Setup the test environment.
+     * @return void
+     */
+    protected function setUp() : void
     {
-        // Just overriding the base setup.
+        parent::setUp();
+
+        // Your code here
     }
 
     public function testFoo()
