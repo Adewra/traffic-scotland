@@ -61,7 +61,7 @@ Configuration
 To publish the configuration file run:
 
 ```
-> php artisan vendor:publish --tag=config --tag=migrations
+> php artisan vendor:publish --tag=config --tag=migrations --tag=seeds
 ```
 
 This will copy the configuration file to `config/trafficscotland.php`.
