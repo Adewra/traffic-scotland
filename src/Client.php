@@ -104,13 +104,13 @@ class Client
         $incidents->each(function($incident) {
 
             if(isset($incident->extended_details))
-                $incident->extended_details = collect($incident->extended_details);
+                $incident->extended_details = collect($incident['extended_details']);
 
             if(isset($incident->weather_conditions))
-                $incident->weather_conditions = collect($incident->weather_conditions);
+                $incident->weather_conditions = collect($incident['weather_conditions']);
 
-            if(isset($incident->weather_conditions2))
-                $incident->weather_conditions2 = collect($incident->weather_conditions2);
+            if(isset($incident['weather_conditions2']))
+                $incident->weather_conditions = collect($incident['weather_conditions2']);
         });
 
         foreach($incidents->all() as $incident)
@@ -128,5 +128,35 @@ class Client
         }
 
         return $incidents;
+    }
+
+    public function roadworks($current = true, $planned = true)
+    {
+        $client = new \Goutte\Client();
+        $client->followRedirects();
+
+        $roadworksFeed = Feed::make('https://trafficscotland.org/rss/feeds/roadworks.aspx');
+        //$title = $currentIncidentsFeed->title;
+        $roadworks = collect($roadworksFeed->items)->map(function ($item) use ($client) {
+
+            $roadwork = $item->toArray();
+            $roadwork['latitude'] = $item->latitude;
+            $roadwork['longitude'] = $item->longitude;
+            $roadwork['link'] = $item->link;
+
+            return $roadwork;
+
+        })->mapInto(Roadwork::class);
+
+        foreach ($roadworks->all() as $roadwork) {
+            \DB::beginTransaction();
+            try {
+                $roadwork->save();
+            } catch (\Exception $e) {
+                \DB::rollback();
+                throw $e;
+            }
+            \DB::commit();
+        }
     }
 }

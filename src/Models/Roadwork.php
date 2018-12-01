@@ -6,9 +6,9 @@ use Carbon\Carbon;
 use GeoJson\Geometry\Point;
 use Illuminate\Database\Eloquent\Model;
 
-class Incident extends Model
+class Roadwork extends Model
 {
-    protected $table = 'incidents';
+    protected $table = 'roadworks';
     protected $primaryKey = 'id';
     protected $increments = true;
 
@@ -18,19 +18,16 @@ class Incident extends Model
         'link',
         'latitude',
         'longitude',
-        'authors',
         'comments',
         'date',
-        'extended_details',
-        'weather_conditions'
+        'start_date',
+        'end_date',
+        'delay_information'
     ];
 
     protected $casts = [
-        'authors' => 'array',
         'latitude' => 'float',
-        'longitude' => 'float',
-        'extended_details' => 'array',
-        'weather_conditions' => 'array'
+        'longitude' => 'float'
     ];
 
     protected $hidden = [
@@ -43,18 +40,10 @@ class Incident extends Model
     ];
 
     protected $dates = [
-        'date'
+        'date',
+        'start_date',
+        'end_date'
     ];
-
-    public function extendedDetails()
-    {
-        return $this->hasOne(IncidentInformation::class, 'id','extended_details');
-    }
-
-    public function weatherConditions()
-    {
-        return $this->hasOne(IncidentInformation::class, 'id','weather_conditions');
-    }
 
     public function setDateAttribute($value)
     {
