@@ -35,6 +35,7 @@ composer require adewra/trafficscotland
  5.4.x    | Untested
  5.5.x    | Untested
  5.6.x    | Untested
+ 5.7.x    | Test Build
 
 And add the service provider in `config/app.php`:
 
@@ -98,6 +99,7 @@ Package Features
  Translations    | No
  Middleware    | No
  Events   | No
+ Seeds    | Yes
  
 Minimum Viable Product
 -------- 
@@ -124,11 +126,10 @@ Examples
  ```php
  $incidents = TrafficScotland::currentIncidents();
  ```
-  ```
-  php artisan trafficscotland:currentincidents
-  ```
-  ```
-  php artisan tinker
-  >>> Adewra\TrafficScotland\Incident::all();
-  ```
-  
+ ```
+ php artisan trafficscotland:currentincidents
+ ```
+ ```
+ php artisan tinker
+ >>> Adewra\TrafficScotland\Incident::all();
+ ```
