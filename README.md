@@ -10,6 +10,8 @@ Table of contents
 * [Testing](#testing)
 * [Configuration](#configuration)
 * [Troubleshooting](#troubleshooting)
+* [Package Features](#troubleshooting)
+* [Minimum Viable Product](#minimumviableproduct)
 * [Examples](#examples)
 
 Installation
@@ -53,11 +55,6 @@ Testing
 
 Test's haven't been written yet.
 
-Troubleshooting
--------
-
-Troubleshooting hasn't been written yet.
-
 Configuration
 -------------
 
@@ -83,7 +80,13 @@ To run our database migrations that allow for storing of the data:
 php artisan migrate --path=/packages/adewra/trafficscotland/src/migrations
 ```
 
-Features
+
+Troubleshooting
+-------
+
+Troubleshooting hasn't been written yet.
+
+Package Features
 -------------
 
  Type  | Included
@@ -98,6 +101,23 @@ Features
  Events   | No
  Seeds    | Yes
  
+Minimum Viable Product
+-------- 
+- [x] Current Incidents
+- [x] Roadworks
+- [x] Traffic Status
+- [ ] Live Traffic Cameras
+- [ ] Park and Ride
+- [ ] Bridge Wind Restrictions Forecast
+- [ ] Police Travel Warnings
+- [ ] Variable Message Signs
+- [ ] Highways England
+- [ ] News
+- [x] Events
+- [ ] Gritters
+- [x] Region Filtering
+- [x] GIS Features
+
 Examples
 -------- 
  
