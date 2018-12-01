@@ -5,10 +5,59 @@ return [
     /**
      * Enable or disable the capturing of extended accident details by visiting the permalink.
      */
-    'scrape_data' => env('TRAFFICSCOTLAND_SCRAPE_DATA','false'),
+    'scrape_data' => env('TRAFFICSCOTLAND_SCRAPE_DATA', false),
 
     /**
-     * Enable or disable the capturing of extended accident details by visiting the permalink.
+     * Also collect data from Highways England
+     *
+     *  Not yet implemented.
+     *
      */
-    'scrape_data' => env('TRAFFICSCOTLAND_SCRAPE_DATA','false'),
+    'highways_england' => false,
+
+    /**
+     * Limit collection to one or more regions, or all regions by using '*'
+     *                                    ^ (Spelling matters, pick from the list below)
+     * HighlandAndWesternIsles, Grampian, CentralTaysideAndFife, Strathclyde, SouthWestScotlandLothianAndBorders
+     *
+     *  Not yet implemented.
+     *
+     */
+    'regions' => [
+        '*'
+    ]
+
+    /**
+     * Just flip the switch to enable the functionality
+     *
+     *  Not yet implemented.
+     *
+     */
+    'news' => true,
+
+    'current_incidents' => [
+        'extended_details' => true,
+        'weather_conditions' => true
+    ],
+
+    'roadworks' => [
+        'current' => true,
+        'planned' => true,
+    ],
+
+    'traffic_status' => true,
+
+    'live_traffic_cameras' => true,
+
+    'park_and_ride' => true,
+
+    'bridge_wind_restrictions_forecast' => true,
+
+    'police_travel_warnings' => true,
+
+    'variable_message_signs' => true,
+
+    'events' => true,
+
+    'gritters' => true
 ];
