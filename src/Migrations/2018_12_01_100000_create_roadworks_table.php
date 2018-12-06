@@ -21,6 +21,8 @@ class CreateRoadworksTable extends Migration
             $t->date('start_date')->nullable();
             $t->date('end_date')->nullable();
             $t->longText('delay_information')->nullable();
+            $t->longText('works')->nullable();
+            $t->longText('traffic_management')->nullable();
 
             $t->timestamps();
         });

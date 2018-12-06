@@ -34,6 +34,7 @@ class Incident extends Model
     ];
 
     protected $hidden = [
+        'description',
         'latitude',
         'longitude'
     ];

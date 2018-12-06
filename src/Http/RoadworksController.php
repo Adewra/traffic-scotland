@@ -12,6 +12,9 @@ class RoadworksController extends Controller
      */
     private $client;
 
+    private $currentRoadworks;
+    private $plannedRoadworks;
+
     public function __construct()
     {
         $this->client = new \Adewra\TrafficScotland\Client();
@@ -25,7 +28,21 @@ class RoadworksController extends Controller
      */
     public function index()
     {
-        return $this->client->roadworks(true, true);
+        $this->currentRoadworks = collect();
+        //$this->currentRoadworks = $this->client->roadworks(true, false);
+        $this->plannedRoadworks = $this->client->roadworks(false, true);
+
+        if($this->currentRoadworks->count() > 0)
+        {
+            if($this->plannedRoadworks->count() > 0)
+                return $this->currentRoadworks->merge($this->plannedRoadworks);
+            else
+                return $this->currentRoadworks;
+        }
+        else if($this->plannedRoadworks->count() > 0)
+            return $this->plannedRoadworks;
+
+        return collect();
     }
 
     /**
