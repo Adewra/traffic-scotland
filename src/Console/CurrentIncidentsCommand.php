@@ -13,7 +13,7 @@ class CurrentIncidentsCommand extends Command
      * @var string
      */
     protected $signature = 'trafficscotland:currentincidents
-                            {--fictional-option : Some fictional option that does nothing}';
+                            {--summary : Summary of Current Incidents }';
 
     /**
      * The console command description.

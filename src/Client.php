@@ -109,8 +109,8 @@ class Client
             if(isset($incident->weather_conditions))
                 $incident->weather_conditions = collect($incident['weather_conditions']);
 
-            if(isset($incident['weather_conditions2']))
-                $incident->weather_conditions = collect($incident['weather_conditions2']);
+            if(isset($incident->weather_conditions2))
+                $incident->weather_conditions2 = collect($incident['weather_conditions2']);
         });
 
         foreach($incidents->all() as $incident)
@@ -144,6 +144,48 @@ class Client
             $roadwork['longitude'] = $item->longitude;
             $roadwork['link'] = $item->link;
 
+            $descriptionFormatted = collect(explode('<br>', $item->description))->map(function ($item) {
+                list($key, $value) = explode(": ", $item);
+                return [$key => $value];
+            })->mapWithKeys(function ($item) {
+                return [snake_case(key($item)) => $item[key($item)]];
+            });
+
+            $roadwork['start_date'] = Carbon::createFromFormat("l, d F Y \- H:i", $descriptionFormatted['start_date']);
+            $roadwork['end_date'] = Carbon::createFromFormat("l, d F Y \- H:i", $descriptionFormatted['end_date']);
+            if(isset($descriptionFormatted['delay_information']))
+                $roadwork['delay_information'] = $descriptionFormatted['delay_information'];
+
+            if($this->config['scrape_data'] == true) {
+                try {
+                    /* Having to extrapolate identifier portion as the redirect changes the case of the parameter */
+                    $param = strtolower(substr(str_replace('http://tscot.org/', '', $item->link),  3));
+                    $crawler = $client->request('POST', 'https://trafficscotland.org/roadworks/details.aspx?id=c'.$param, [
+                        'allow_redirects' => true
+                    ]);
+
+                    if(strcasecmp($crawler->filter('div#roadworkdetail')->first()->text(),
+                        "Sorry, no information is available for this roadwork.") !== 0)
+                    {
+                        $roadworkDetails = collect($crawler->filter('div#roadworkdetail table tr')->each(function ($node, $i) {
+                            list($key, $value) = explode(": ", trim(preg_replace('!\s+!', ' ', $node->text())), 2);
+                            //dd(array($key => $value));
+                            return array($key => $value);
+                        }))->mapWithKeys(function ($item) {
+                            return [snake_case(key($item)) => $item[key($item)]];
+                        });
+                        //dd($roadworkDetails);
+                        $roadwork['extended_details'] = $roadworkDetails;
+                        $roadwork['media_release'] = null;
+                    }
+                }
+                catch(\Exception $exception)
+                {
+                    dd($exception);
+                    throw $exception;
+                }
+            }
+
             return $roadwork;
 
         })->mapInto(Roadwork::class);
@@ -158,5 +200,7 @@ class Client
             }
             \DB::commit();
         }
+
+        return $roadworks;
     }
 }
