@@ -25,7 +25,7 @@ return [
      */
     'regions' => [
         '*'
-    ]
+    ],
 
     /**
      * Just flip the switch to enable the functionality
@@ -33,7 +33,7 @@ return [
      *  Not yet implemented.
      *
      */
-    'news' => true,
+    'news' => false,
 
     'current_incidents' => [
         'extended_details' => true,
@@ -45,19 +45,19 @@ return [
         'planned' => true,
     ],
 
-    'traffic_status' => true,
+    'traffic_status' => false,
 
-    'live_traffic_cameras' => true,
+    'live_traffic_cameras' => false,
 
-    'park_and_ride' => true,
+    'park_and_ride' => false,
 
-    'bridge_wind_restrictions_forecast' => true,
+    'bridge_wind_restrictions_forecast' => false,
 
-    'police_travel_warnings' => true,
+    'police_travel_warnings' => false,
 
-    'variable_message_signs' => true,
+    'variable_message_signs' => false,
 
     'events' => true,
 
-    'gritters' => true
+    'gritters' => false
 ];
