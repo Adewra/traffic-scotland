@@ -22,6 +22,8 @@ class Roadwork extends Model
         'date',
         'start_date',
         'end_date',
+        'works',
+        'traffic_management',
         'delay_information'
     ];
 
@@ -31,6 +33,7 @@ class Roadwork extends Model
     ];
 
     protected $hidden = [
+        'description',
         'latitude',
         'longitude'
     ];

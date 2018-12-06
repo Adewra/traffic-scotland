@@ -8,7 +8,7 @@ class CurrentIncidentsSeeder extends Seeder
 {
     public function run()
     {
-        \DB::table('incidents')->insert([
+        \DB::table('current_incidents')->insert([
             'title' => 'M8 J19 Clydeside Expressway - Queue',
             'description' => '3 lanes restricted Eastbound indefinitely',
             'link' => 'http://tscot.org/01c223189',
@@ -20,7 +20,7 @@ class CurrentIncidentsSeeder extends Seeder
             'updated_at' => \Carbon\Carbon::now()
         ]);
 
-        \DB::table('incidents')->insert([
+        \DB::table('current_incidents')->insert([
             'title' => 'A82 Spean Bridge - A830 - Accident',
             'description' => 'The A82 at Fort William Golf Club is currently restricted due to a road traffic accident.  Road users are advised to use caution on approach and allow extra time for their journey.',
             'link' => 'http://tscot.org/01c223198',
@@ -32,7 +32,7 @@ class CurrentIncidentsSeeder extends Seeder
             'updated_at' => \Carbon\Carbon::now()
         ]);
 
-        \DB::table('incidents')->insert([
+        \DB::table('current_incidents')->insert([
             'title' => 'A9000 Forth Road Bridge - High winds',
             'description' => 'Road users are advised to use caution crossing the A90 Forth Road Bridge due to high winds currently affecting driving conditions.',
             'link' => 'http://tscot.org/01c223503',
@@ -44,7 +44,7 @@ class CurrentIncidentsSeeder extends Seeder
             'updated_at' => \Carbon\Carbon::now()
         ]);
 
-        \DB::table('incidents')->insert([
+        \DB::table('current_incidents')->insert([
             'title' => 'Grampian - Low temperature',
             'description' => 'Road users are advised to drive with care due to low temperatures affecting driving conditions on many roads throughout the region.',
             'link' => 'http://tscot.org/01a9706',

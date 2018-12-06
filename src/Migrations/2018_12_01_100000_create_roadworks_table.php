@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatRoadworksTable extends Migration
+class CreateRoadworksTable extends Migration
 {
     public function up()
     {
@@ -15,12 +15,14 @@ class CreatRoadworksTable extends Migration
             $t->mediumText('link')->nullable();
             $t->decimal('latitude')->nullable();
             $t->decimal('longitude')->nullable();
-            $t->json('authors');
+            $t->json('authors')->nullable();
             $t->longText('comments')->nullable();
             $t->dateTime('date');
             $t->date('start_date')->nullable();
             $t->date('end_date')->nullable();
             $t->longText('delay_information')->nullable();
+            $t->longText('works')->nullable();
+            $t->longText('traffic_management')->nullable();
 
             $t->timestamps();
         });
