@@ -3,11 +3,11 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateIncidentTable extends Migration
+class CreateCurrentIncidentTable extends Migration
 {
     public function up()
     {
-        \Schema::create('incidents', function(Blueprint $t)
+        \Schema::create('current_incidents', function(Blueprint $t)
         {
             $t->bigIncrements('id');
             $t->string('title', 255);
@@ -28,6 +28,6 @@ class CreateIncidentTable extends Migration
 
     public function down()
     {
-        \Schema::drop('incidents');
+        \Schema::drop('current_incidents');
     }
 }
