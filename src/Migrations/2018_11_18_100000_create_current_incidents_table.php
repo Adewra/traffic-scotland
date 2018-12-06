@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCurrentIncidentTable extends Migration
+class CreateCurrentIncidentsTable extends Migration
 {
     public function up()
     {
@@ -15,7 +15,7 @@ class CreateCurrentIncidentTable extends Migration
             $t->mediumText('link')->nullable();
             $t->decimal('latitude')->nullable();
             $t->decimal('longitude')->nullable();
-            $t->json('authors');
+            $t->json('authors')->nullable();
             $t->longText('comments')->nullable();
             $t->dateTime('date');
             $t->json('extended_details')->nullable();
