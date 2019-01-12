@@ -247,4 +247,39 @@ class Client
 
         return $roadworks;
     }
+
+    public function events()
+    {
+        $client = new \Goutte\Client();
+        $client->followRedirects();
+
+        $events = collect();
+
+        if ($this->config['scrape_data'] == true) {
+            try {
+                $crawler = $client->request('POST', 'https://trafficscotland.org/interactiveevents/map.aspx?layer=52', [
+                    'allow_redirects' => true
+                ]);
+
+                dd($crawler);
+
+            } catch (\Exception $exception) {
+                dd($exception);
+                throw $exception;
+            }
+        }
+
+        foreach ($events->all() as $event) {
+            \DB::beginTransaction();
+            try {
+                $event->save();
+            } catch (\Exception $e) {
+                \DB::rollback();
+                throw $e;
+            }
+            \DB::commit();
+        }
+
+        return $events;
+    }
 }
