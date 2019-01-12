@@ -135,3 +135,16 @@ Examples
  php artisan tinker
  >>> Adewra\TrafficScotland\Incident::all();
  ```
+ 
+  **Retrieving Roadworks**
+  
+  ```php
+  $roadworks = TrafficScotland::roadworks(true, false);
+  ```
+  ```
+  php artisan trafficscotland:roadworks
+  ```
+  ```
+  php artisan tinker
+  >>> Adewra\TrafficScotland\Roadwork::all();
+  ```
