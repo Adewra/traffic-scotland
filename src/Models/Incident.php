@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Incident extends Model
 {
-    protected $table = 'incidents';
+    protected $table = 'current_incidents';
     protected $primaryKey = 'id';
     protected $increments = true;
 
