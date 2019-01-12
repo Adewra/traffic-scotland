@@ -13,10 +13,9 @@ class RoadworksCommand extends Command
      * @var string
      */
     protected $signature = 'trafficscotland:roadworks
-                            {
-                                --current : Current Roadworks
-                                --planned : Planned Roadworks
-                            }';
+                                { --current : Current Roadworks }
+                                { --planned : Planned Roadworks }
+                            ';
 
     /**
      * The console command description.
@@ -30,10 +29,11 @@ class RoadworksCommand extends Command
      *
      * @param RoadworksController $controller
      * @return mixed
+     * @throws
      */
     public function handle(RoadworksController $controller)
     {
-        $controller->index();
+        $controller->index($this->option('current') ?? false, $this->option('planned') ?? false);
         return;
     }
 }
