@@ -257,11 +257,45 @@ class Client
 
         if ($this->config['scrape_data'] == true) {
             try {
-                $crawler = $client->request('POST', 'https://trafficscotland.org/interactiveevents/map.aspx?layer=52', [
+                $crawler = $client->request('POST', 'https://trafficscotland.org/plannedevents/index.aspx', [
                     'allow_redirects' => true
                 ]);
 
-                dd($crawler);
+                $rows = $crawler->filter('table.infogrid tbody tr')->each(function ($node, $i) use ($events) {
+                    $row = collect($node->filter('td')->each(function($node){
+                        return trim(preg_replace('!\s+!', ' ', $node->text()));
+                    }))->filter(function ($value, $key) {
+                        return $value != "";
+                    })->toArray();
+
+                    $links = collect($node->filter('td.l a')->each(function($link) { return parse_url($link->link()->getUri()); }));
+                    $links = $links->filter(function($url) { return !empty($url['query']); } );
+                    $eventsLink = $links->filter(function($url) { return str_contains($url['path'], ['event.aspx']); } );
+
+                    foreach ($eventsLink as $link)
+                    {
+                        $event = Event::create(['identifier' => str_replace('id=','', $link['query'])]);
+                        $events->push($event);
+                    }
+
+                    dd($events);
+
+                    $eventIdentifier = null;
+                    $venueIdentifier = null;
+
+                    return [
+                        'identifier' => '',
+                        'name' => $row[3],
+                        'date' => '',
+                        'start_date' => Carbon::parse($row[1]),
+                        'end_date' => Carbon::parse($row[2]),
+                        'icon' => '',
+                        'description' => '',
+                        'historic_attendance' => '',
+                        'last_updated_by_provider' => '',
+                        'venue'
+                    ];
+                });
 
             } catch (\Exception $exception) {
                 dd($exception);
