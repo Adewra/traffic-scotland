@@ -18,96 +18,34 @@ class RoadworksController extends Controller
     public function __construct()
     {
         $this->client = new \Adewra\TrafficScotland\Client();
+        $this->currentRoadworks = collect();
+        $this->plannedRoadworks = collect();
     }
 
     /**
      * Display a listing of the resource.
      *
+     * @param $current boolean Current roadworks
+     * @param $planned boolean Planned roadworks
      * @return \Illuminate\Http\Response
      * @throws \Exception
      */
-    public function index()
+    public function index($current = true, $planned = true)
     {
-        $this->currentRoadworks = collect();
-        //$this->currentRoadworks = $this->client->roadworks(true, false);
-        $this->plannedRoadworks = $this->client->roadworks(false, true);
+        $roadworks = collect();
+
+        if($current == true)
+            $this->currentRoadworks = $this->client->roadworks(true, false);
+
+        if($planned == true)
+            $this->plannedRoadworks = $this->client->roadworks(false, true);
 
         if($this->currentRoadworks->count() > 0)
-        {
-            if($this->plannedRoadworks->count() > 0)
-                return $this->currentRoadworks->merge($this->plannedRoadworks);
-            else
-                return $this->currentRoadworks;
-        }
-        else if($this->plannedRoadworks->count() > 0)
-            return $this->plannedRoadworks;
+            $roadworks->merge($this->currentRoadworks);
 
-        return collect();
-    }
+        if($this->plannedRoadworks->count() > 0)
+            $roadworks->merge($this->plannedRoadworks);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        return $roadworks;
     }
 }
