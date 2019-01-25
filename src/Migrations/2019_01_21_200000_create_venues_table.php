@@ -18,6 +18,7 @@ class CreateVenuesTable extends Migration
             $t->string('telephone', 255);
             $t->mediumText('website');
             $t->unsignedSmallInteger('crowd_capacity');
+            $t->mediumText('link');
 
             $t->timestamps();
         });
