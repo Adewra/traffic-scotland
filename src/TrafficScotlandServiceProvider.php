@@ -28,7 +28,8 @@ class TrafficScotlandServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Console\CurrentIncidentsCommand::class,
-                Console\RoadworksCommand::class
+                Console\RoadworksCommand::class,
+                Console\EventsCommand::class
             ]);
         }
     }
