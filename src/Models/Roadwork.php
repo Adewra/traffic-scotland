@@ -81,4 +81,14 @@ class Roadwork extends Model
         else
             return null;
     }
+
+    private function isPlanned()
+    {
+        return isset($this->attributes['works']) && isset($this->attributes['traffic_management']);
+    }
+
+    private function isCurrent()
+    {
+        return !$this->isPlanned();
+    }
 }
