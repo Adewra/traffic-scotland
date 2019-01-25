@@ -22,7 +22,7 @@ class CreateEventsTable extends Migration
             $t->dateTime('last_updated_by_provider');
             $t->unsignedBigInteger('venue_id');
 
-            $t->foreign('venue_id')->references('id')->on('venues');
+            //$t->foreign('venue_id')->references('id')->on('venues');
             $t->timestamps();
         });
     }

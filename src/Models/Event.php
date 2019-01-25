@@ -16,11 +16,12 @@ class Event extends Model
         'date',
         'start_date',
         'end_date',
+        'link',
         'icon',
         'description',
         'historic_attendance',
         'last_updated_by_provider',
-        'venue',
+        'venue_id',
     ];
 
     protected $casts = [

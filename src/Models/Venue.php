@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Venue extends Model
 {
-    protected $table = 'venue';
+    protected $table = 'venues';
     protected $primaryKey = 'id';
     protected $increments = true;
 
@@ -18,8 +18,7 @@ class Venue extends Model
         'postcode',
         'telephone',
         'website',
-        'crowd_capacity',
-        'travel_details'
+        'crowd_capacity'
         ];
 
     protected $casts = [
