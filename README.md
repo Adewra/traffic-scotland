@@ -124,14 +124,28 @@ Examples
 -------- 
  
  **Retrieving Current Incidents**
- 
- ```php
- $incidents = TrafficScotland::currentIncidents();
- ```
- ```
- php artisan trafficscotland:currentincidents
- ```
- ```
- php artisan tinker
- >>> Adewra\TrafficScotland\Incident::all();
- ```
+  
+  ```php
+  $incidents = TrafficScotland::currentIncidents();
+  ```
+  ```
+  php artisan trafficscotland:currentincidents
+  ```
+  ```
+  php artisan tinker
+  >>> Adewra\TrafficScotland\Incident::all();
+  ```
+  
+  **Retrieving Events and Venues**
+   
+   ```php
+   $events = TrafficScotland::events();
+   ```
+   ```
+   php artisan trafficscotland:events
+   ```
+   ```
+   php artisan tinker
+   >>> Adewra\TrafficScotland\Event::all();
+   >>> Adewra\TrafficScotland\Venue::all();
+   ```
