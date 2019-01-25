@@ -20,7 +20,7 @@ class CreateEventsTable extends Migration
             $t->mediumText('description');
             $t->smallInteger('historic_attendance');
             $t->dateTime('last_updated_by_provider');
-            $t->unsignedBigInteger('venue_id');
+            //$t->unsignedBigInteger('venue_id');
 
             //$t->foreign('venue_id')->references('id')->on('venues');
             $t->timestamps();
