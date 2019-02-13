@@ -262,68 +262,87 @@ class Client
                     'allow_redirects' => true
                 ]);
 
-                $rows = $crawler->filter('table.infogrid tbody tr')->each(function ($node, $i) use ($events, $venues, $client) {
-                    $row = collect($node->filter('td')->each(function($node){
-                        return trim(preg_replace('!\s+!', ' ', $node->text()));
-                    }))->filter(function ($value, $key) {
-                        return $value != "";
-                    })->toArray();
-                    $row[5] = collect($node->filter('img[alt="Event Icon"]'))->first()->getAttribute('src');
+                $pages = collect($crawler->filter("div.grid-paging a")->each(function($link) { return $link->link(); }));
 
-                    $links = collect($node->filter('td.l a')->each(function($link) { return ['original' => $link->link()->getUri(), 'parsed' => parse_url($link->link()->getUri())]; }));
-                    $links = $links->filter(function($url) { return !empty($url['parsed']['query']); } );
-                    $eventsLink = $links->filter(function($url) { return str_contains($url['parsed']['path'], ['event.aspx']); } );
-                    $venuesLinks = $links->filter(function($url) { return str_contains($url['parsed']['path'], ['venue.aspx']); } );
+                foreach ($pages as $page)
+                {
+                    $crawler->filter('table.infogrid tbody tr')->each(function ($node, $i) use ($events, $venues, $client) {
+                        $row = collect($node->filter('td')->each(function($node){
+                            return trim(preg_replace('!\s+!', ' ', $node->text()));
+                        }))->filter(function ($value, $key) {
+                            return $value != "";
+                        })->toArray();
+                        $row[5] = collect($node->filter('img[alt="Event Icon"]'))->first()->getAttribute('src');
 
-                    foreach ($venuesLinks as $link)
-                    {
-                        $venue = \Adewra\TrafficScotland\Venue::firstOrNew(
-                            [
-                                'identifier' => str_replace('id=','', $link['parsed']['query']),
-                            ],
-                            [
-                                'name' => '',
-                                'address' => '',
-                                'city' => '',
-                                'postcode' => '',
-                                'link' => $link['original'],
-                                'telephone' => '',
-                                'website' => '',
-                                'crowd_capacity' => ''
+                        $links = collect($node->filter('td.l a')->each(function($link) { return ['original' => $link->link()->getUri(), 'parsed' => parse_url($link->link()->getUri())]; }));
+                        $links = $links->filter(function($url) { return !empty($url['parsed']['query']); } );
+                        $eventsLink = $links->filter(function($url) { return str_contains($url['parsed']['path'], ['event.aspx']); } );
+                        $venuesLinks = $links->filter(function($url) { return str_contains($url['parsed']['path'], ['venue.aspx']); } );
+
+                        foreach ($venuesLinks as $link)
+                        {
+                            $venueDetailsCrawler = $client->request('POST', $link['original'], [
+                                'allow_redirects' => true
                             ]);
-                        $venues->push($venue);
-                    }
 
-                    foreach ($eventsLink as $link)
-                    {
-                        $eventDetailsCrawler = $client->request('POST', $link['original'], [
-                            'allow_redirects' => true
-                        ]);
+                            $venueDetails = collect($venueDetailsCrawler->filter("table#cphMain_cmpVenueDetails_tblData tr")->each(function ($node, $i) use ($events, $venues, $client) {
+                                list($key, $value) = explode(": ", trim(preg_replace('!\s+!', ' ', $node->text())), 2);
+                                return array($key => $value);
+                            }))->mapWithKeys(function ($item) {
+                                return [snake_case(key($item)) => $item[key($item)]];
+                            });
 
-                        $eventDetails = collect($eventDetailsCrawler->filter("table#cphMain_cmpPlannedEventDetails_tblData tr")->each(function ($node, $i) use ($events, $venues, $client) {
-                            list($key, $value) = explode(": ", trim(preg_replace('!\s+!', ' ', $node->text())), 2);
-                            return array($key => $value);
-                        }))->mapWithKeys(function ($item) {
-                            return [snake_case(key($item)) => $item[key($item)]];
-                        });
+                            $venue = \Adewra\TrafficScotland\Venue::firstOrNew(
+                                [
+                                    'identifier' => str_replace('id=','', $link['parsed']['query']),
+                                ],
+                                [
+                                    'name' => $venueDetails['venue_name'],
+                                    'address' => $venueDetails['address'],
+                                    'city' => $venueDetails['city'],
+                                    'postcode' => $venueDetails['post_code'],
+                                    'link' => $link['original'],
+                                    'telephone' => $venueDetails['telephone'],
+                                    'email' => $venueDetails['email'] ?? null,
+                                    'website' => $venueDetails['web_address'],
+                                    'crowd_capacity' => $venueDetails['crowd_capacity'] ?? null
+                                ]);
+                            $venues->push($venue);
+                        }
 
-                        $event = \Adewra\TrafficScotland\Event::firstOrNew(
-                            [
-                                'identifier' => str_replace('id=','', $link['parsed']['query']),
-                            ],
-                            [
-                                'name' => $row[3],
-                                'start_date' => Carbon::parse($row[1]),
-                                'end_date' => Carbon::parse($row[2]),
-                                'link' => $link['original'],
-                                'icon' => $row[5],
-                                'description' => $eventDetails['description'],
-                                'historic_attendance' => $eventDetails['historic_attendance'] ?? '',
-                                'last_updated_by_provider' => Carbon::createFromFormat("d M y \- H:i", $eventDetails['last_updated_by_provider'])
+                        foreach ($eventsLink as $link)
+                        {
+                            $eventDetailsCrawler = $client->request('POST', $link['original'], [
+                                'allow_redirects' => true
                             ]);
-                        $events->push($event);
-                    }
-                });
+
+                            $eventDetails = collect($eventDetailsCrawler->filter("table#cphMain_cmpPlannedEventDetails_tblData tr")->each(function ($node, $i) use ($events, $venues, $client) {
+                                list($key, $value) = explode(": ", trim(preg_replace('!\s+!', ' ', $node->text())), 2);
+                                return array($key => $value);
+                            }))->mapWithKeys(function ($item) {
+                                return [snake_case(key($item)) => $item[key($item)]];
+                            });
+
+                            $event = \Adewra\TrafficScotland\Event::firstOrNew(
+                                [
+                                    'identifier' => str_replace('id=','', $link['parsed']['query']),
+                                ],
+                                [
+                                    'name' => $row[3],
+                                    'start_date' => Carbon::parse($row[1]),
+                                    'end_date' => Carbon::parse($row[2]),
+                                    'link' => $link['original'],
+                                    'icon' => $row[5],
+                                    'description' => $eventDetails['description'],
+                                    'historic_attendance' => $eventDetails['historic_attendance'] ?? null,
+                                    'last_updated_by_provider' => Carbon::createFromFormat("d M y \- H:i", $eventDetails['last_updated_by_provider'])
+                                ]);
+                            $events->push($event);
+                        }
+                    });
+
+                    $crawler = $client->click($page);
+                }
 
             } catch (\Exception $exception) {
                 dd($exception);

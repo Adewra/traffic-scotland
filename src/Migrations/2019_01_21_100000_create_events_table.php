@@ -17,9 +17,9 @@ class CreateEventsTable extends Migration
             $t->mediumText('link');
             $t->string('icon', 255);
             $t->mediumText('description');
-            $t->smallInteger('historic_attendance');
+            $t->smallInteger('historic_attendance')->nullable();
             $t->dateTime('last_updated_by_provider');
-            //$t->unsignedBigInteger('venue_id');
+            //$t->unsignedBigInteger('venue_id')->nullable();
 
             //$t->foreign('venue_id')->references('id')->on('venues');
             $t->timestamps();

@@ -16,6 +16,7 @@ class Venue extends Model
         'address',
         'city',
         'postcode',
+        'link',
         'telephone',
         'website',
         'crowd_capacity'
