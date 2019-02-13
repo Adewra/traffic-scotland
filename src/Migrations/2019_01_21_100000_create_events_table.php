@@ -10,12 +10,11 @@ class CreateEventsTable extends Migration
         \Schema::create('events', function(Blueprint $t)
         {
             $t->bigIncrements('id');
-            $t->unsignedBigInteger('identifier');
+            $t->unsignedBigInteger('identifier')->unique();
             $t->string('name', 255);
             $t->dateTime('start_date');
             $t->dateTime('end_date');
             $t->mediumText('link');
-            $t->dateTime('date');
             $t->string('icon', 255);
             $t->mediumText('description');
             $t->smallInteger('historic_attendance');
