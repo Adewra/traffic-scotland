@@ -12,7 +12,7 @@ class CreateVenuesTable extends Migration
             $t->unsignedBigInteger('id')->autoIncrement();
             $t->unsignedBigInteger('identifier');
             $t->string('name', 255);
-            $t->mediumText('address');
+            $t->mediumText('address')->nullable();
             $t->string('city', 255);
             $t->string('postcode', 8);
             $t->string('telephone', 255);

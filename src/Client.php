@@ -298,7 +298,7 @@ class Client
                                 ],
                                 [
                                     'name' => $venueDetails['venue_name'],
-                                    'address' => $venueDetails['address'],
+                                    'address' => $venueDetails['address'] ?? null,
                                     'city' => $venueDetails['city'],
                                     'postcode' => $venueDetails['post_code'],
                                     'link' => $link['original'],
