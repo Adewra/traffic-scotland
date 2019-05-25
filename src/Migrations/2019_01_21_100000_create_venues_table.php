@@ -15,8 +15,8 @@ class CreateVenuesTable extends Migration
             $t->mediumText('address')->nullable();
             $t->string('city', 255);
             $t->string('postcode', 8);
-            $t->string('telephone', 255);
-            $t->mediumText('website');
+            $t->string('telephone', 255)->nullable();
+            $t->mediumText('website')->nullable();
             $t->string('email', 1024)->nullable();
             $t->unsignedSmallInteger('crowd_capacity')->nullable();
             $t->mediumText('link');

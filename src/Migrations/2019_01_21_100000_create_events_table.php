@@ -12,8 +12,8 @@ class CreateEventsTable extends Migration
             $t->bigIncrements('id');
             $t->unsignedBigInteger('identifier')->unique();
             $t->string('name', 255);
-            $t->dateTime('start_date');
-            $t->dateTime('end_date');
+            $t->dateTime('start_time');
+            $t->dateTime('end_time');
             $t->mediumText('link');
             $t->string('icon', 255);
             $t->mediumText('description');
