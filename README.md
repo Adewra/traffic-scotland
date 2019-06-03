@@ -106,8 +106,8 @@ Package Features
 Minimum Viable Product
 -------- 
 - [x] Current Incidents
-- [x] Roadworks
-- [x] Traffic Status
+- [x] Roadworks (Current & Planned)
+- [ ] Traffic Status
 - [ ] Live Traffic Cameras
 - [ ] Park and Ride
 - [ ] Bridge Wind Restrictions Forecast
@@ -124,27 +124,32 @@ Examples
 -------- 
  
  **Retrieving Current Incidents**
- 
- ```php
- $incidents = TrafficScotland::currentIncidents();
- ```
- ```
- php artisan trafficscotland:currentincidents
- ```
- ```
- php artisan tinker
- >>> Adewra\TrafficScotland\Incident::all();
- ```
+  
+  ```php
+    $incidents = TrafficScotland::currentIncidents();
+  ```
+  ```
+    php artisan trafficscotland:currentincidents
+  ```
+  ```
+    php artisan tinker
+    >>> Adewra\TrafficScotland\Incident::all();
+  ```
  
   **Retrieving Roadworks**
   
-  ```php
-  $roadworks = TrafficScotland::roadworks(true, false);
-  ```
-  ```
-  php artisan trafficscotland:roadworks
-  ```
-  ```
-  php artisan tinker
-  >>> Adewra\TrafficScotland\Roadwork::all();
-  ```
+   ```php
+    $roadworks = TrafficScotland::roadworks(true, false);
+   ```
+   ```
+    php artisan trafficscotland:roadworks
+   ```
+   ```
+    php artisan tinker
+    >>> Adewra\TrafficScotland\Roadwork::all();
+   ```
+   
+   Lessons Learned
+   -------- 
+   
+   - I should have realised Goutte wouldn't be able to handle Traffic Scotland's website's javascript based navigation and gone with Selenium 2 from the beginning. Using Behat's Mink I am able to easily switch between both.

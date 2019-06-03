@@ -3,15 +3,31 @@
 namespace Adewra\TrafficScotland;
 
 use ArandiLopez\Feed\Facades\Feed;
+use Behat\Mink\Mink;
+use Behat\Mink\Session;
 use Carbon\Carbon;
+use DMore\ChromeDriver\ChromeDriver;
 
 class Client
 {
     private $config = [];
+    private $prefixes = [
+        '03c' => 'Current Roadworks',
+        '04p' => 'Planned Roadworks',
+        '03h' => 'Current Roadworks (Highways England)',
+        '04h' => 'Planned Roadworks (Highways England)'
+    ];
+    protected $mink;
 
     public function __construct()
     {
         $this->config = config('trafficscotland');
+        $this->mink = new Mink(array(
+            'roadworks' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/')),
+            'events' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/'))
+        ));
+
+        // /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-gpu --headless --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
     }
 
     public function currentIncidents()
@@ -20,7 +36,6 @@ class Client
         $client->followRedirects();
 
         $currentIncidentsFeed = Feed::make('https://trafficscotland.org/rss/feeds/currentincidents.aspx');
-        //$title = $currentIncidentsFeed->title;
         $incidents = collect($currentIncidentsFeed->items)->map(function ($item, $key) use ($client) {
 
             $incident = $item->toArray();
@@ -132,112 +147,128 @@ class Client
 
     public function roadworks(bool $current = true, bool $planned = true)
     {
-        $client = new \Goutte\Client();
-        $client->followRedirects();
-
+        $feeds = collect();
+        if($current)
+            $feeds->push([
+                'name' => 'current',
+                'url' => 'https://trafficscotland.org/rss/feeds/roadworks.aspx']
+            );
+        if($planned)
+            $feeds->push([
+                'name' => 'planned',
+                'url' => 'https://trafficscotland.org/rss/feeds/plannedroadworks.aspx']
+            );
 
         $roadworks = collect();
-        $currentRoadworks = collect();
-        $plannedRoadworks = collect();
 
-        if($current === true) {
-            $currentRoadworksFeed = Feed::make('https://trafficscotland.org/rss/feeds/roadworks.aspx');
-            $currentRoadworks = collect($currentRoadworksFeed->items)->map(function ($item) use ($client) {
+        $capturedFields = ['start_date','end_date','delay_information','works','traffic_management'];
+        $uncapturedFields = [];
 
-                $currentRoadwork = $item->toArray();
-                $currentRoadwork['latitude'] = $item->latitude;
-                $currentRoadwork['longitude'] = $item->longitude;
-                $currentRoadwork['link'] = $item->link;
+        foreach ($feeds as $feed)
+        {
+            $prefixes = $this->prefixes;
+            $mink = $this->mink;
+            $roadworks = collect(Feed::make($feed['url'])->items)->map(function ($item) use ($feed, $capturedFields, &$uncapturedFields, $prefixes, $mink) {
 
-                $descriptionFormatted = collect(explode('<br>', $item->description))->map(function ($item) {
-                    list($key, $value) = explode(": ", $item);
-                    return [$key => $value];
-                })->mapWithKeys(function ($item) {
-                    return [snake_case(key($item)) => $item[key($item)]];
-                });
+                $roadwork = $item->toArray();
 
-                $currentRoadwork['start_date'] = Carbon::createFromFormat("l, d F Y \- H:i", $descriptionFormatted['start_date']);
-                $currentRoadwork['end_date'] = Carbon::createFromFormat("l, d F Y \- H:i", $descriptionFormatted['end_date']);
+                /* Having to extrapolate identifier portion as the redirect changes the case of the parameter */
+                $roadwork['identifier'] = str_replace(array_keys($prefixes), '', str_replace('http://tscot.org/', '', $item->link));
+                $roadwork['prefix'] = str_replace($roadwork['identifier'], '', str_replace('http://tscot.org/', '', $item->link));
+                $roadwork['latitude'] = $item->latitude;
+                $roadwork['longitude'] = $item->longitude;
+                $roadwork['link'] = $item->link;
+
+                if($feed['name'] === 'planned') {
+
+                    /* Ideally this should use $this->explode_description(), but it doesnt work as it is different sources */
+
+                    $descriptionFormatted = collect(
+                        explode("#",
+                            str_replace("  Traffic Management:", "#Traffic Management:",
+                                implode(" ", explode("\n",
+                                    str_replace('<br>', "#", $item->description)))
+                            )
+                        )
+                    );
+                    $descriptionFormatted = $descriptionFormatted->map(function ($item) {
+                        list($key, $value) = explode(": ", $item);
+                        return [$key => $value];
+                    })->mapWithKeys(function ($item) {
+                        return [snake_case(key($item)) => $item[key($item)]];
+                    });
+                } else if($feed['name'] === 'current') {
+                    $descriptionFormatted = collect(explode('<br>', $item->description))->map(function ($item) {
+                        list($key, $value) = explode(": ", $item);
+                        return [$key => $value];
+                    })->mapWithKeys(function ($item) {
+                        return [snake_case(key($item)) => $item[key($item)]];
+                    });
+                }
+
+                $roadwork['start_date'] = Carbon::createFromFormat("l, d F Y \- H:i", $descriptionFormatted['start_date']);
+                $roadwork['end_date'] = Carbon::createFromFormat("l, d F Y \- H:i", $descriptionFormatted['end_date']);
                 if (isset($descriptionFormatted['delay_information']))
-                    $currentRoadwork['delay_information'] = $descriptionFormatted['delay_information'];
-
-                if ($this->config['scrape_data'] == true) {
-                    try {
-                        /* Having to extrapolate identifier portion as the redirect changes the case of the parameter */
-                        $param = strtolower(substr(str_replace('http://tscot.org/', '', $item->link), 3));
-                        $crawler = $client->request('POST', 'https://trafficscotland.org/roadworks/details.aspx?id=c' . $param, [
-                            'allow_redirects' => true
-                        ]);
-
-                        if (strcasecmp($crawler->filter('div#roadworkdetail')->first()->text(),
-                                "Sorry, no information is available for this roadwork.") !== 0) {
-                            $roadworkDetails = collect($crawler->filter('div#roadworkdetail table tr')->each(function ($node, $i) {
-                                list($key, $value) = explode(": ", trim(preg_replace('!\s+!', ' ', $node->text())), 2);
-                                return array($key => $value);
-                            }))->mapWithKeys(function ($item) {
-                                return [snake_case(key($item)) => $item[key($item)]];
-                            });
-                            $currentRoadwork['extended_details'] = $roadworkDetails;
-                            $currentRoadwork['media_release'] = null;
-                        }
-                    } catch (\Exception $exception) {
-                        dd($exception);
-                        throw $exception;
-                    }
-                }
-
-                return $currentRoadwork;
-
-            })->mapInto(Roadwork::class);
-        }
-
-        if($planned === true) {
-            $plannedRoadworksFeed = Feed::make('https://trafficscotland.org/rss/feeds/plannedroadworks.aspx');
-            $plannedRoadworks = collect($plannedRoadworksFeed->items)->map(function ($item) use ($client) {
-
-                $plannedRoadwork = $item->toArray();
-                $plannedRoadwork['latitude'] = $item->latitude;
-                $plannedRoadwork['longitude'] = $item->longitude;
-                $plannedRoadwork['link'] = $item->link;
-
-                $descriptionFormatted = collect(explode("#", str_replace("  Traffic Management:", "#Traffic Management:", implode(" ", explode("\n", str_replace('<br>',"#", $item->description))))));
-
-                $descriptionFormatted = $descriptionFormatted->map(function ($item) {
-                    list($key, $value) = explode(": ", $item);
-                    return [$key => $value];
-                })->mapWithKeys(function ($item) {
-                    return [snake_case(key($item)) => $item[key($item)]];
-                });
-
-                $plannedRoadwork['start_date'] = Carbon::createFromFormat("l, d F Y \- H:i", $descriptionFormatted['start_date']);
-                $plannedRoadwork['end_date'] = Carbon::createFromFormat("l, d F Y \- H:i", $descriptionFormatted['end_date']);
+                    $roadwork['delay_information'] = $descriptionFormatted['delay_information'];
                 if (isset($descriptionFormatted['works']))
-                    $plannedRoadwork['works'] = $descriptionFormatted['works'];
+                    $roadwork['works'] = $descriptionFormatted['works'];
                 if (isset($descriptionFormatted['traffic_management']))
-                    $plannedRoadwork['traffic_management'] = $descriptionFormatted['traffic_management'];
+                    $roadwork['traffic_management'] = $descriptionFormatted['traffic_management'];
 
-                //dd($plannedRoadwork);
+                if(array_diff(array_keys($descriptionFormatted->toArray()), $capturedFields) && !str_contains($roadwork['prefix'], ['03h', '04h'])) {
+                    $newUncapturedFields = array_diff(array_keys($descriptionFormatted->toArray()), $capturedFields);
+                    $uncapturedFields = array_unique(array_merge($newUncapturedFields, $uncapturedFields));
+                }
 
-                if ($this->config['scrape_data'] == true) {
-                    try {
+                $browser = $this->mink->getSession('roadworks');
+                if(strcasecmp($roadwork['prefix'], "03c") === 0)
+                {
+                    $browser->visit('https://trafficscotland.org/roadworks/details.aspx?id=c'.$roadwork['identifier']);
+                    $browser = $browser->getPage();
+                    if(str_contains($browser->find('css', 'div#roadworkdetail')->getText(), "Sorry, no information is available for this roadwork."))
+                        echo "Failed to load Roadwork details.";
+                    else
+                    {
+                        $roadworkDetails = collect($browser->findAll('xpath', '//DIV[@id="roadworkdetail"]/TABLE[1]/TBODY[1]/TR[position() <= 5]'))->map(function ($node, $i) {
+                            return [$node->findAll('css', 'td')[0]->getText() => $node->findAll('css', 'td')[1]->getText()];
+                        })->mapWithKeys(function ($item) {
+                            return [snake_case(str_replace(['/',':'], '', key($item))) => $item[key($item)]];
+                        });
+                        $roadworkDetails['description'] = $this->explodeDescription($browser->find('xpath', '//DIV[@id="roadworkdetail"]/TABLE[1]/TBODY[1]/TR[6]/TD[2]')->getHtml());
 
-                    } catch (\Exception $exception) {
-                        dd($exception);
-                        throw $exception;
+                        $days_and_times = collect($browser->findAll('xpath', '//DIV[@id="roadworkdetail"]/TABLE[1]/TBODY[1]/TR[7]/TD[2]/TABLE[@class="daydetail"]/TBODY/TR[position() > 1]'))->map(function($tableRow){
+                          return array_map(function($info) {
+                              return $info->getText();
+                          }, $tableRow->findAll('css', 'td'));
+                        })->map(function($daytime) {
+                            return array_combine(array_map(function($key){
+                                return snake_case($key);
+                            }, ['When','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']), array_values($daytime));
+                        })->toArray();
+                        $roadworkDetails['days_affected'] = [
+                            'week_commencing' => $browser->find('xpath', '//DIV[@id="roadworkdetail"]/TABLE[1]/TBODY[1]/TR[7]/TD[1]')->getHtml() ?? '',
+                            'days_and_times' => $days_and_times ?? '',
+                        ];
+                        $roadworkDetails['media_release'] = $browser->find('xpath', '//DIV[@class="main"]/H2[text()= "Media Release"]/following-sibling::p')->getText();
                     }
                 }
 
-                return $plannedRoadwork;
+                return $roadwork;
 
-            })->mapInto(Roadwork::class);
+            });
         }
 
-        $roadworks = $currentRoadworks->merge($plannedRoadworks);
+        if(count($uncapturedFields) > 0)
+            echo 'Found one or more fields against Roadworks that haven\'t been captured ('.implode(',', $uncapturedFields).').';
+
+        $roadworks = $roadworks->filter(function($roadwork){
+           return isset($roadwork['title']);
+        });
 
         foreach ($roadworks->all() as $roadwork) {
             \DB::beginTransaction();
             try {
-                $roadwork->save();
+                Roadwork::updateOrCreate(['identifier' => $roadwork['identifier']], $roadwork);
             } catch (\Exception $e) {
                 \DB::rollback();
                 throw $e;
@@ -247,4 +278,24 @@ class Client
 
         return $roadworks;
     }
+
+    private function explodeDescription($description)
+    {
+        return collect(array_filter(explode('<br><br>', $description), function ($element) {
+                return trim($element) != ""; }
+            ))
+            ->map(function($info) {
+                return explode(':<br>', $info);
+            })
+            ->mapWithKeys(function ($item) {
+                try {
+                    return [snake_case($item[0]) => explode('<br>', $item[1] ?? '')];
+                } catch (\Exception $exception) {
+                    return $item[0];
+                }
+            })
+            ->toArray();
+    }
+
+
 }
