@@ -135,3 +135,8 @@ Examples
     php artisan tinker
     >>> Adewra\TrafficScotland\Incident::all();
   ```
+   
+   Lessons Learned
+   -------- 
+   
+   - I should have realised Goutte wouldn't be able to handle Traffic Scotland's website's javascript based navigation and gone with Selenium 2 from the beginning. Using Behat's Mink I am able to easily switch between both.
