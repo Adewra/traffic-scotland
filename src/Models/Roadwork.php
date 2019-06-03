@@ -13,6 +13,7 @@ class Roadwork extends Model
     protected $increments = true;
 
     protected $fillable = [
+        'identifier',
         'title',
         'description',
         'link',

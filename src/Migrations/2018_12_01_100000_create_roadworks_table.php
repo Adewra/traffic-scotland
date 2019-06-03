@@ -10,6 +10,8 @@ class CreateRoadworksTable extends Migration
         \Schema::create('roadworks', function(Blueprint $t)
         {
             $t->bigIncrements('id');
+            $t->string('identifier', 255)->unique();
+            $t->string('prefix', 6);
             $t->string('title', 255);
             $t->longText('description');
             $t->mediumText('link')->nullable();
@@ -20,9 +22,12 @@ class CreateRoadworksTable extends Migration
             $t->dateTime('date');
             $t->date('start_date')->nullable();
             $t->date('end_date')->nullable();
-            $t->longText('delay_information')->nullable();
-            $t->longText('works')->nullable();
-            $t->longText('traffic_management')->nullable();
+            $t->json('delay_information')->nullable();
+            $t->json('works')->nullable();
+            $t->json('traffic_management')->nullable();
+            $t->json('diversion_information')->nullable();
+            $t->json('days_affected')->nullable();
+            $t->json('media_release')->nullable();
 
             $t->timestamps();
         });
