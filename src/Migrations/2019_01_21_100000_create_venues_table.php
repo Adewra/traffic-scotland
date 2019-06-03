@@ -10,7 +10,7 @@ class CreateVenuesTable extends Migration
         \Schema::create('venues', function(Blueprint $t)
         {
             $t->unsignedBigInteger('id')->autoIncrement();
-            $t->unsignedBigInteger('identifier');
+            $t->unsignedBigInteger('identifier')->unique();
             $t->string('name', 255);
             $t->mediumText('address')->nullable();
             $t->string('city', 255);
