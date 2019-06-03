@@ -6,6 +6,7 @@ use ArandiLopez\Feed\Facades\Feed;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Carbon\Carbon;
+use DMore\ChromeDriver\ChromeDriver;
 
 class Client
 {
@@ -259,83 +260,67 @@ class Client
 
     public function events()
     {
-        $client = new \Goutte\Client();
-        $client->followRedirects();
-
         $events = collect();
         $venues = collect();
 
         if ($this->config['scrape_data'] == true) {
             try {
-                $crawler = $client->request('POST', 'https://trafficscotland.org/plannedevents/index.aspx', [
-                    'allow_redirects' => true
-                ]);
+                $browser = $this->mink->getSession('events');
+                $browser->visit('https://trafficscotland.org/plannedevents/index.aspx');
+                $browser = $browser->getPage();
 
-                $rows = $crawler->filter('table.infogrid tbody tr')->each(function ($node, $i) use ($events, $venues) {
-                    $row = collect($node->filter('td')->each(function($node){
-                        return trim(preg_replace('!\s+!', ' ', $node->text()));
-                    }))->filter(function ($value, $key) {
+                $showAllSelect = $browser->find('css', 'select#cphMain_pevents_cmpPlannedEventList_ddlPaging');
+                $showAllSelect->selectOption('Show All');
+                $pagingGo = $browser->find('css', 'input#cphMain_pevents_cmpPlannedEventList_btnChangePaging');
+                $pagingGo->click();
+
+                $tableRows = $browser->findAll("css", 'table.infogrid tbody tr');
+                /**
+                 * Below was to capture items not on the detail page, such as the iconography.
+                 */
+                /*$eventRows = collect($tableRows)->map(function ($node, $i) use ($events, $venues, $mink) {
+
+                    $data = collect();
+                    foreach ($node->findAll("css", 'td') as $td)
+                        $data->push(trim(preg_replace('!\s+!', ' ', $td->getText())));
+                    $row = $data->filter(function ($value, $key) {
                         return $value != "";
                     })->toArray();
+                    $row[5] = collect($node->findAll("css", 'img[alt="Event Icon"]'))->first();
+                    if (!is_null($row[5]))
+                        $row[5] = $row[5]->getAttribute('src');
 
-                    $links = collect($node->filter('td.l a')->each(function($link) { return ['original' => $link->link()->getUri(), 'parsed' => parse_url($link->link()->getUri())]; }));
-                    $links = $links->filter(function($url) { return !empty($url['parsed']['query']); } );
-                    $eventsLink = $links->filter(function($url) { return str_contains($url['parsed']['path'], ['event.aspx']); } );
-                    $venuesLinks = $links->filter(function($url) { return str_contains($url['parsed']['path'], ['venue.aspx']); } );
+                    return $row;
+                });*/
 
-                    foreach ($venuesLinks as $link)
-                    {
-                        $venue = \Adewra\TrafficScotland\Venue::create([
-                            'identifier' => str_replace('id=','', $link['parsed']['query']),
-                            'name' => '',
-                            'address' => '',
-                            'city' => '',
-                            'postcode' => '',
-                            'link' => $link['original'],
-                            'telephone' => '',
-                            'website' => '',
-                            'crowd_capacity' => ''
-                        ]);
-                        $venues->push($venue);
-                    }
+                $events = collect();
+                $venues = collect();
 
-                    foreach ($eventsLink as $link)
-                    {
-                        $event = \Adewra\TrafficScotland\Event::create([
-                            'identifier' => str_replace('id=','', $link['parsed']['query']),
-                            'name' => '',
-                            'date' => '',
-                            'start_date' => '',
-                            'end_date' => '',
-                            'link' => $link['original'],
-                            'icon' => '',
-                            'description' => '',
-                            'historic_attendance' => '',
-                            'last_updated_by_provider' => '',
-                            'venue_id' => '',
-                        ]);
-                        $events->push($event);
-                    }
+                $links = collect($tableRows)->map(function ($row) {
+                    $links = collect();
+                    foreach($row->findAll("css", 'td.l a') as $link)
+                        $links->push($link->getAttribute('href'));
+                    return $links->filter(function ($value, $key) {
+                        return $value != null;
+                    });
+                })->flatten();
 
-                    //dd($events);
+                $eventsLinks = $links->filter(function($url) { return str_contains($url, ['event.aspx']); } )->toArray();
+                $venuesLinks = $links->filter(function($url) { return str_contains($url, ['venue.aspx']); } )->toArray();
 
-                    $eventIdentifier = null;
-                    $venueIdentifier = null;
+                foreach ($venuesLinks as $venuesLink)
+                {
+                    $identifier = intval(str_replace("venue.aspx?id=", "", $venuesLink));
+                    $venue = (new Venue())->scrape($mink, $identifier);
+                    $venues->push($venue);
+                }
 
-                    return [
-                        'identifier' => '',
-                        'name' => $row[3],
-                        'date' => '',
-                        'start_date' => Carbon::parse($row[1]),
-                        'end_date' => Carbon::parse($row[2]),
-                        'link' => '',
-                        'icon' => '',
-                        'description' => '',
-                        'historic_attendance' => '',
-                        'last_updated_by_provider' => '',
-                        'venue_id'
-                    ];
-                });
+                foreach ($eventsLinks as $eventLink)
+                {
+                    $identifier = intval(str_replace("event.aspx?id=", "", $eventLink));
+                    $event = (new Event())->scrape($mink, $identifier);
+                    $events->push($event);
+                }
 
             } catch (\Exception $exception) {
                 dd($exception);
@@ -343,28 +328,34 @@ class Client
             }
         }
 
-        foreach ($venues->all() as $venue) {
-            \DB::beginTransaction();
-            try {
-                $venue->save();
-            } catch (\Exception $e) {
-                \DB::rollback();
-                throw $e;
+        /*if($this->attributes['persist'] == true)
+        {*/
+            foreach ($venues->all() as $venue) {
+                \DB::beginTransaction();
+                try {
+                    $venue->save();
+                } catch (\Exception $e) {
+                    \DB::rollback();
+                    throw $e;
+                }
+                \DB::commit();
             }
-            \DB::commit();
-        }
 
-        foreach ($events->all() as $event) {
-            \DB::beginTransaction();
-            try {
-                $event->save();
-            } catch (\Exception $e) {
-                \DB::rollback();
-                throw $e;
+            foreach ($events->all() as $event) {
+                \DB::beginTransaction();
+                try {
+                    $event->save();
+                } catch (\Exception $e) {
+                    \DB::rollback();
+                    throw $e;
+                }
+                \DB::commit();
             }
-            \DB::commit();
-        }
+        /*/}*/
 
-        return $events;
+        return collect(['events' => $events, 'venues' => $venues]);
     }
+
+
+
 }
