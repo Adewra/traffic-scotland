@@ -106,8 +106,8 @@ Package Features
 Minimum Viable Product
 -------- 
 - [x] Current Incidents
-- [x] Roadworks
-- [x] Traffic Status
+- [x] Roadworks (Current & Planned)
+- [ ] Traffic Status
 - [ ] Live Traffic Cameras
 - [ ] Park and Ride
 - [ ] Bridge Wind Restrictions Forecast
