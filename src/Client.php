@@ -3,15 +3,24 @@
 namespace Adewra\TrafficScotland;
 
 use ArandiLopez\Feed\Facades\Feed;
+use Behat\Mink\Mink;
+use Behat\Mink\Session;
 use Carbon\Carbon;
 
 class Client
 {
     private $config = [];
+    protected $mink;
 
     public function __construct()
     {
         $this->config = config('trafficscotland');
+        $this->mink = new Mink(array(
+            'roadworks' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/')),
+            'events' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/'))
+        ));
+
+        // /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-gpu --headless --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
     }
 
     public function currentIncidents()
