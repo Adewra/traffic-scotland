@@ -15,6 +15,12 @@ class Client
     public function __construct()
     {
         $this->config = config('trafficscotland');
+        $this->mink = new Mink(array(
+            'roadworks' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/')),
+            'events' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/'))
+        ));
+
+        // /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-gpu --headless --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
     }
 
     public function currentIncidents()
@@ -253,18 +259,12 @@ class Client
 
     public function events()
     {
-        $mink = new Mink(array(
-            'browser' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/'))
-            ));
-
-        // /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-gpu --headless --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
-
         $events = collect();
         $venues = collect();
 
         if ($this->config['scrape_data'] == true) {
             try {
-                $browser = $mink->getSession('browser');
+                $browser = $this->mink->getSession('events');
                 $browser->visit('https://trafficscotland.org/plannedevents/index.aspx');
                 $browser = $browser->getPage();
 
@@ -274,7 +274,10 @@ class Client
                 $pagingGo->click();
 
                 $tableRows = $browser->findAll("css", 'table.infogrid tbody tr');
-                $eventRows = collect($tableRows)->map(function ($node, $i) use ($events, $venues, $mink) {
+                /**
+                 * Below was to capture items not on the detail page, such as the iconography.
+                 */
+                /*$eventRows = collect($tableRows)->map(function ($node, $i) use ($events, $venues, $mink) {
 
                     $data = collect();
                     foreach ($node->findAll("css", 'td') as $td)
@@ -287,19 +290,18 @@ class Client
                         $row[5] = $row[5]->getAttribute('src');
 
                     return $row;
-                });
+                });*/
 
                 $events = collect();
                 $venues = collect();
 
-                $links = collect($eventRows)->map(function ($row) {
+                $links = collect($tableRows)->map(function ($row) {
                     $links = collect();
                     foreach($row->findAll("css", 'td.l a') as $link)
                         $links->push($link->getAttribute('href'));
                     return $links->filter(function ($value, $key) {
                         return $value != null;
                     });
-                    return $links;
                 })->flatten();
 
                 $eventsLinks = $links->filter(function($url) { return str_contains($url, ['event.aspx']); } )->toArray();
@@ -350,9 +352,7 @@ class Client
             }
         /*/}*/
 
-        var_dump(collect(['events' => $events, 'venues' => $venues]));
-        return;
-        //return $output;
+        return collect(['events' => $events, 'venues' => $venues]);
     }
 
 
