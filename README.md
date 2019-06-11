@@ -119,6 +119,11 @@ Minimum Viable Product
 - [ ] Gritters
 - [x] Region Filtering
 - [x] GIS Features
+ 
+Methods
+--------
+
+RSS Feeds, Web Scraping & JSON API
 
 Examples
 -------- 
