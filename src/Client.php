@@ -299,47 +299,49 @@ class Client
                 /**
                  * Below was to capture items not on the detail page, such as the iconography.
                  */
-                /*$eventRows = collect($tableRows)->map(function ($node, $i) use ($events, $venues, $mink) {
+                $events = collect();
+                $venues = collect();
+                $links = collect();
+
+                $eventRows = collect($tableRows)->map(function ($node, $i) use ($events, $venues, &$links) {
 
                     $data = collect();
                     foreach ($node->findAll("css", 'td') as $td)
                         $data->push(trim(preg_replace('!\s+!', ' ', $td->getText())));
-                    $row = $data->filter(function ($value, $key) {
+                    $row = array_combine(['start_date','end_date','name','venues'], array_values($data->filter(function ($value, $key) {
                         return $value != "";
-                    })->toArray();
-                    $row[5] = collect($node->findAll("css", 'img[alt="Event Icon"]'))->first();
-                    if (!is_null($row[5]))
-                        $row[5] = $row[5]->getAttribute('src');
+                    })->toArray()));
+                    $row['icon'] = collect($node->findAll("css", 'img[alt="Event Icon"]'))->first();
+                    if (!is_null($row['icon']))
+                        $row['icon'] = $row['icon']->getAttribute('src');
+                    $eventLinks = $node->findAll("xpath", "//A[contains(@href, 'event.aspx')]");
+                    $venueLinks = $node->findAll("xpath", "//A[contains(@href, 'venue.aspx')]");
+                    foreach(array_merge($eventLinks, $venueLinks) as $link)
+                    {
+                        $link2 = parse_str(parse_url($link->getAttribute('href'), PHP_URL_QUERY), $linkCopy);
+                        $newLink = [
+                            'original' => $link->getAttribute('href'),
+                            'parsed' => collect($linkCopy)
+                        ];
+                        $links->push($newLink);
+                        $row['identifier'] = $newLink['parsed']['id'];
+                    }
 
-                    return $row;
-                });*/
+                    return $node;
+                });
 
-                $events = collect();
-                $venues = collect();
+                $eventsLinks = $links->filter(function($url) { return str_contains($url['original'], ['event.aspx']); } )->toArray();
+                $venuesLinks = $links->filter(function($url) { return str_contains($url['original'], ['venue.aspx']); } )->toArray();
 
-                $links = collect($tableRows)->map(function ($row) {
-                    $links = collect();
-                    foreach($row->findAll("css", 'td.l a') as $link)
-                        $links->push($link->getAttribute('href'));
-                    return $links->filter(function ($value, $key) {
-                        return $value != null;
-                    });
-                })->flatten();
-
-                $eventsLinks = $links->filter(function($url) { return str_contains($url, ['event.aspx']); } )->toArray();
-                $venuesLinks = $links->filter(function($url) { return str_contains($url, ['venue.aspx']); } )->toArray();
-
-                foreach ($venuesLinks as $venuesLink)
+                foreach ($venuesLinks as $venueLink)
                 {
-                    $identifier = intval(str_replace("venue.aspx?id=", "", $venuesLink));
-                    $venue = (new Venue())->scrape($mink, $identifier);
+                    $venue = (new Venue())->scrape($this->mink, intval($venueLink['parsed']['id']));
                     $venues->push($venue);
                 }
 
                 foreach ($eventsLinks as $eventLink)
                 {
-                    $identifier = intval(str_replace("event.aspx?id=", "", $eventLink));
-                    $event = (new Event())->scrape($mink, $identifier);
+                    $event = (new Event())->scrape($this->mink, intval($eventLink['parsed']['id']));
                     $events->push($event);
                 }
 
@@ -377,8 +379,6 @@ class Client
         return collect(['events' => $events, 'venues' => $venues]);
     }
 
-
-
     private function explodeDescription($description)
     {
         return collect(array_filter(explode('<br><br>', $description), function ($element) {
@@ -396,6 +396,5 @@ class Client
             })
             ->toArray();
     }
-
 
 }
