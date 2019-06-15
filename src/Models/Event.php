@@ -51,10 +51,10 @@ class Event extends Model
         if(is_int($identifier))
             $this->attributes['identifier'] = $identifier;
 
-        if(isset($this->attributes['identifier']))
+        if(!is_null($this->identifier))
         {
             $link = 'https://trafficscotland.org/plannedevents/event.aspx?id='.$this->attributes['identifier'];
-            $browser = $mink->getSession('browser');
+            $browser = $mink->getSession('events');
             $browser->visit($link);
             $browser = $browser->getPage();
 
@@ -70,7 +70,7 @@ class Event extends Model
 
             $eventDetails = $eventDetails->toArray();
 
-            return $this->firstOrNew(
+            return $this->updateOrCreate(
                 [
                     'identifier' => $identifier,
                 ],

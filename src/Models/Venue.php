@@ -40,13 +40,12 @@ class Venue extends Model
         if(is_int($identifier))
             $this->attributes['identifier'] = $identifier;
 
-        if(isset($this->attributes['identifier']))
+        if(!is_null($this->identifier))
         {
             $link = 'https://trafficscotland.org/plannedevents/venue.aspx?id='.$this->attributes['identifier'];
-            $browser = $mink->getSession('browser');
+            $browser = $mink->getSession('events');
             $browser->visit($link);
             $browser = $browser->getPage();
-
 
             $venueDetails = collect($browser->findAll("css", "table#cphMain_cmpVenueDetails_tblData tr"))->map(function ($node, $i)  {
                 list($key, $value) = explode(": ", trim(preg_replace('!\s+!', ' ', $node->getText())), 2);
@@ -55,7 +54,7 @@ class Venue extends Model
                 return [snake_case(key($item)) => $item[key($item)]];
             });
 
-            $venue = $this->firstOrNew(
+            return $this->updateOrCreate(
                 [
                     'identifier' => $identifier,
                 ],
@@ -70,8 +69,6 @@ class Venue extends Model
                     'website' => $venueDetails['web_address'] ?? null,
                     'crowd_capacity' => $venueDetails['crowd_capacity'] ?? null
                 ]);
-
-            return $venue;
         }
 
         return null;
