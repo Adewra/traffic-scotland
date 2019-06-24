@@ -14,6 +14,7 @@ class Roadwork extends Model
 
     protected $fillable = [
         'identifier',
+        'prefix',
         'title',
         'description',
         'link',
@@ -23,9 +24,14 @@ class Roadwork extends Model
         'date',
         'start_date',
         'end_date',
+        'week_commencing',
+        'direction',
         'works',
         'traffic_management',
-        'delay_information'
+        'delay_information',
+        'diversion_information',
+        'extra_location_details',
+        'affected_dates'
     ];
 
     protected $casts = [
