@@ -3,17 +3,45 @@
 return [
 
     /**
-     * Enable or disable the capturing of extended accident details by visiting the permalink.
-     */
-    'scrape_data' => env('TRAFFICSCOTLAND_SCRAPE_DATA', false),
-
-    /**
-     * Also collect data from Highways England
+     * Just flip the switch to enable the functionality
      *
      *  Not yet implemented.
      *
      */
-    'highways_england' => false,
+    'functionality' => [
+        'news' => true,
+
+        'current_incidents' => true,
+
+        'roadworks' => [
+            'current' => true,
+            'planned' => true,
+        ],
+
+        'traffic_status' => true,
+
+        'live_traffic_cameras' => true,
+
+        'park_and_ride' => true,
+
+        'bridge_wind_restrictions_forecast' => true,
+
+        'police_travel_warnings' => true,
+
+        'variable_message_signs' => true,
+
+        'events' => true,
+
+        'gritters' => true
+    ],
+
+    'collection_methods' => [
+        'rss_feeds' => true,
+        'api' => true,
+        'webpage_scraping' => false,
+    ],
+
+    'storage' => true,
 
     /**
      * Limit collection to one or more regions, or all regions by using '*'
@@ -26,38 +54,4 @@ return [
     'regions' => [
         '*'
     ],
-
-    /**
-     * Just flip the switch to enable the functionality
-     *
-     *  Not yet implemented.
-     *
-     */
-    'news' => false,
-
-    'current_incidents' => [
-        'extended_details' => true,
-        'weather_conditions' => true
-    ],
-
-    'roadworks' => [
-        'current' => true,
-        'planned' => true,
-    ],
-
-    'traffic_status' => false,
-
-    'live_traffic_cameras' => false,
-
-    'park_and_ride' => false,
-
-    'bridge_wind_restrictions_forecast' => false,
-
-    'police_travel_warnings' => false,
-
-    'variable_message_signs' => false,
-
-    'events' => true,
-
-    'gritters' => false
 ];
