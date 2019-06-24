@@ -41,6 +41,8 @@ return [
         'webpage_scraping' => false,
     ],
 
+    'storage' => true,
+
     /**
      * Limit collection to one or more regions, or all regions by using '*'
      *                                    ^ (Spelling matters, pick from the list below)
