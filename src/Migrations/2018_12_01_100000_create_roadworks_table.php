@@ -22,11 +22,14 @@ class CreateRoadworksTable extends Migration
             $t->dateTime('date');
             $t->date('start_date')->nullable();
             $t->date('end_date')->nullable();
-            $t->json('delay_information')->nullable();
+            $t->date('week_commencing')->nullable();
+            $t->string('direction', 255)->nullable();
             $t->json('works')->nullable();
             $t->json('traffic_management')->nullable();
+            $t->json('delay_information')->nullable();
             $t->json('diversion_information')->nullable();
-            $t->json('days_affected')->nullable();
+            $t->string('extra_location_details')->nullable();
+            $t->json('affected_dates')->nullable();
             $t->json('media_release')->nullable();
 
             $t->timestamps();
