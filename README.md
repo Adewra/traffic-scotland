@@ -68,12 +68,23 @@ To publish the configuration file run:
 
 This will copy the configuration file to `config/trafficscotland.php`.
 
-Here is an example configuration:
+Here is an example (and the default) configuration:
 
 ```php
-'trafficscotland' => [
-    'scrape_data' => env('TRAFFICSCOTLAND_SCRAPE_DATA', false),
-]]
+    'functionality' => [
+            'current_incidents' => true,
+            'roadworks' => [
+                'current' => true,
+                'planned' => true,
+            ],
+    ],
+    'collection_methods' => [
+            'rss_feeds' => false,
+            'webpage_scraping' => false,
+            'api' => true,
+        ],
+    'events' => true,
+    'storage' => true,
 ```
 
 To run our database migrations that allow for storing of the data:

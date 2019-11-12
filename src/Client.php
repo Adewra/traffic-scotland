@@ -259,6 +259,8 @@ class Client
 
                                 if(!is_null($browser->find('xpath', '//DIV[@id="roadworkdetail"]/TABLE[1]/TBODY[1]/TR[7]')))
                                 {
+                                    /* @TODO Add support for multiple weeks affected */
+
                                     $days_and_times = collect($browser->findAll('xpath', '//DIV[@id="roadworkdetail"]/TABLE[1]/TBODY[1]/TR[7]/TD[2]/TABLE[@class="daydetail"]/TBODY/TR[position() > 1]'))->map(function($tableRow){
                                         return array_map(function($info) {
                                             return $info->getText();
@@ -275,9 +277,23 @@ class Client
                                 }
 
                                 $roadworkDetails['media_release'] = $browser->find('xpath', '//DIV[@class="main"]/H2[text()= "Media Release"]/following-sibling::p')->getText();
+
+                                /* @TODO Finish merging $roadwork and $roadworkDetails */
                             }
                         }
+                        elseif(strcasecmp($roadwork['prefix'], "04p") === 0)
+                        {
+                            /* @TODO Add support for web scraping planned roadworks */
+                        }
                     }
+
+                    $roadwork['locationName'] = $roadwork['title']; unset($roadwork['title']);
+                    $roadwork['startDateTime'] = $roadwork['start_date']; unset($roadwork['start_date']);
+                    $roadwork['endDateTime'] = $roadwork['end_date']; unset($roadwork['end_date']);
+                    unset($roadwork['date']);
+                    unset($roadwork['prefix']);
+                    unset($roadwork['link']);
+                    $roadwork['delayInformation'] = isset($roadwork['delay_information']) ? $roadwork['delay_information'] : ''; unset($roadwork['delay_information']);
 
                     return $roadwork;
 
@@ -287,17 +303,51 @@ class Client
             if(count($uncapturedFields) > 0)
                 echo 'Found one or more fields against Roadworks that haven\'t been captured ('.implode(',', $uncapturedFields).').';
 
-            $roadworks = $roadworks->filter(function($roadwork){
-                return isset($roadwork['title']);
+            $roadworks = $roadworks->filter(function($roadwork) {
+                return !empty($roadwork['locationName']);
             });
         }
+        else if($this->config['collection_methods']['api'] === true)
+        {
+            if($current) {
+                $browser = $this->mink->getSession('roadworks');
+                $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/current-roadworks');
+                $currentRoadworks = json_decode($browser->getPage()->getText());
+                foreach ($currentRoadworks->layer->points as $currentRoadwork) {
+                    $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/current-roadworks/' . $currentRoadwork->pointId);
+                    $roadwork = json_decode($browser->getPage()->getText(), true);
+                    $roadwork['description'] = $this->explodeDescription2($roadwork['description'])->toArray();
+                    $roadworks->push($roadwork);
+                }
+            }
 
+            if($planned) {
+                $browser = $this->mink->getSession('roadworks');
+                $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/planned-roadworks');
+                $plannedRoadworks = json_decode($browser->getPage()->getText());
+                foreach ($plannedRoadworks->layer->points as $plannedRoadwork) {
+                    $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/planned-roadworks/' . $plannedRoadwork->pointId);
+                    $roadwork = json_decode($browser->getPage()->getText(), true);
+                    $roadwork['description'] = $this->explodeDescription2($roadwork['description'])->toArray();
+                    $roadworks->push($roadwork);
+                }
+            }
+        }
+        else
+        {
+            print "Skipping Roadworks as there is no suitable collection method available.";
+        }
 
         if($this->config['storage'] === true) {
             foreach ($roadworks->all() as $roadwork) {
                 \DB::beginTransaction();
                 try {
-                    Roadwork::updateOrCreate(['identifier' => $roadwork['identifier']], $roadwork);
+                    Roadwork::updateOrCreate(
+                        [
+                            'identifier' => $roadwork['plannedRoadworkId'] ?? $roadwork['roadworkId'],
+                            'source' => $roadwork['source']
+                        ]
+                        , $roadwork);
                 } catch (\Exception $e) {
                     \DB::rollback();
                     throw $e;
@@ -383,6 +433,10 @@ class Client
                 throw $exception;
             }
         }
+        else
+        {
+            print "Skipping Events as there is no suitable collection method available.";
+        }
 
         if($this->config['storage'] === true) {
             foreach ($venues->all() as $venue) {
@@ -427,6 +481,38 @@ class Client
                 }
             })
             ->toArray();
+    }
+
+    private function explodeDescription2($description)
+    {
+        $x = collect(explode("\r\n", $description))
+            ->reject(function($x){return $x === "";})
+            ->values();
+
+        $keys = $x->filter(function($text) {
+            return strpos($text, ":", -1);
+        })->map(function($text) {
+            return substr($text, 0, -1);
+        });
+
+        $trailingValues = $x->filter(function($text) {
+            return strpos($text, ":", -1) === false;
+        });
+
+        $keysIndexes = $keys->keys()->values();
+
+        $x = $keys->mapWithKeys(function ($startingKey, $startingKeyIndex) use ($keysIndexes, $trailingValues) {
+            /* Requires extra package, spatie/laravel-collection-macros */
+            $endingKeyIndex = $keysIndexes->after($startingKeyIndex);
+
+            $values = $trailingValues->filter(function($value, $key) use ($startingKeyIndex, $endingKeyIndex) {
+                return $key > $startingKeyIndex && ($key < $endingKeyIndex || is_null($endingKeyIndex));
+            })->values();
+
+            return [snake_case($startingKey) => $values];
+        });
+
+        return $x;
     }
 
 }

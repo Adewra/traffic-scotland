@@ -9,7 +9,7 @@ return [
      *
      */
     'functionality' => [
-        'news' => true,
+        //'news' => true,
 
         'current_incidents' => true,
 
@@ -18,7 +18,7 @@ return [
             'planned' => true,
         ],
 
-        'traffic_status' => true,
+        /*'traffic_status' => true,
 
         'live_traffic_cameras' => true,
 
@@ -28,11 +28,11 @@ return [
 
         'police_travel_warnings' => true,
 
-        'variable_message_signs' => true,
+        'variable_message_signs' => true,*/
 
         'events' => true,
 
-        'gritters' => true
+        /*'gritters' => true*/
     ],
 
     'collection_methods' => [

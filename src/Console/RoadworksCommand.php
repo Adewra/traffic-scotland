@@ -36,23 +36,26 @@ class RoadworksCommand extends Command
         if($this->option('current') == null && $this->option('planned') == null)
             $currentPlannedOrBoth = $this->anticipate('Would you like current, planned or both?', ['current','planned','both']);
 
+        $current = $this->option('current') ?? false;
+        $planned = $this->option('planned') ?? false;
+
         if(isset($currentPlannedOrBoth))
         {
             switch (strtolower($currentPlannedOrBoth)) {
                 case "current":
-                    $this->option('current', true);
+                    $current = true;
                     break;
                 case "planned":
-                    $this->option('planned', true);
+                    $planned = true;
                     break;
                 case "both":
-                    $this->option('current', true);
-                    $this->option('planned', true);
+                    $current = true;
+                    $planned = true;
                     break;
             }
         }
 
-        $controller->index($this->option('current') ?? false, $this->option('planned') ?? false);
+        $controller->index($current, $planned);
         return;
     }
 }

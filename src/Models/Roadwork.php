@@ -14,27 +14,36 @@ class Roadwork extends Model
 
     protected $fillable = [
         'identifier',
-        'title',
+        'source',
+        'locationName',
         'description',
-        'link',
+        'delayInformation',
+        'diversionInformation',
+        'whenType',
+        'weekDays',
+        'extraLocationDetails',
+        'locationX',
+        'locationY',
+        'endDateTime',
+        'startDateTime',
+        'weekCommencing',
+        'directionText',
+        'pressReleaseText',
         'latitude',
         'longitude',
-        'comments',
-        'date',
-        'start_date',
-        'end_date',
-        'works',
-        'traffic_management',
-        'delay_information'
+        'isOnHomePage',
+        'affectedWeeks'
     ];
 
     protected $casts = [
         'latitude' => 'float',
-        'longitude' => 'float'
+        'longitude' => 'float',
+        'description' => 'array',
+        'affectedWeeks' => 'array',
+        'isOnHomePage' => 'boolean'
     ];
 
     protected $hidden = [
-        'description',
         'latitude',
         'longitude'
     ];
@@ -81,15 +90,5 @@ class Roadwork extends Model
             return new Point([$this->latitude, $this->longitude]);
         else
             return null;
-    }
-
-    private function isPlanned()
-    {
-        return isset($this->attributes['works']) && isset($this->attributes['traffic_management']);
-    }
-
-    private function isCurrent()
-    {
-        return !$this->isPlanned();
     }
 }
