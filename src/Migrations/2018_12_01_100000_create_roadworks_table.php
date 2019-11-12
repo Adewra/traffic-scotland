@@ -10,27 +10,26 @@ class CreateRoadworksTable extends Migration
         \Schema::create('roadworks', function(Blueprint $t)
         {
             $t->bigIncrements('id');
-            $t->string('identifier', 255)->unique();
-            $t->string('prefix', 6);
-            $t->string('title', 255);
-            $t->longText('description');
-            $t->mediumText('link')->nullable();
+
+            $t->string('identifier', 255);
+            $t->string('source', 32);
+
+            $t->string('locationName', 255);
+            $t->multiLineString('description')->nullable();
+            $t->string('whenType')->nullable();
+            $t->string('weekDays')->nullable();
+            $t->string('extraLocationDetails')->nullable();
+            $t->unsignedInteger('locationX')->nullable();
+            $t->unsignedInteger('locationY')->nullable();
+            $t->dateTime('endDateTime')->nullable();
+            $t->dateTime('startDateTime')->nullable();
+            $t->dateTime('weekCommencing')->nullable();
+            $t->string('directionText')->nullable();
+            $t->string('pressReleaseText')->nullable();
             $t->decimal('latitude')->nullable();
             $t->decimal('longitude')->nullable();
-            $t->json('authors')->nullable();
-            $t->longText('comments')->nullable();
-            $t->dateTime('date');
-            $t->date('start_date')->nullable();
-            $t->date('end_date')->nullable();
-            $t->date('week_commencing')->nullable();
-            $t->string('direction', 255)->nullable();
-            $t->json('works')->nullable();
-            $t->json('traffic_management')->nullable();
-            $t->json('delay_information')->nullable();
-            $t->json('diversion_information')->nullable();
-            $t->string('extra_location_details')->nullable();
-            $t->json('affected_dates')->nullable();
-            $t->json('media_release')->nullable();
+            $t->boolean('isOnHomePage')->nullable();
+            $t->json('affectedWeeks')->nullable();
 
             $t->timestamps();
         });
