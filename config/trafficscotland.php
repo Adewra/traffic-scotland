@@ -11,7 +11,7 @@ return [
     'functionality' => [
         //'news' => true,
 
-        'current_incidents' => true,
+        'incidents' => true,
 
         'roadworks' => [
             'current' => true,
@@ -37,7 +37,7 @@ return [
 
     'collection_methods' => [
         'rss_feeds' => true,
-        'api' => true,
+        'api' => false,
         'webpage_scraping' => false,
     ],
 

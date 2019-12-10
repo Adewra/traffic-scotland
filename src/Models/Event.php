@@ -14,23 +14,21 @@ class Event extends Model
 
     protected $fillable = [
         'identifier',
-        'name',
-        'date',
-        'start_time',
-        'end_time',
-        'link',
-        'icon',
+        'startDateTime',
+        'endDateTime',
         'description',
-        'historic_attendance',
-        'last_updated_by_provider',
-        'venue_id',
+        'historicAttendance',
+        'isCancelled',
+        'isCurrent',
+        'lastUpdated',
+        'name',
+        'venueId'
     ];
 
     protected $casts = [
-        'date' => 'date',
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
-        'last_updated_by_provider' => 'datetime'
+        'startDateTime' => 'datetime',
+        'endDateTime' => 'datetime',
+        'lastUpdated' => 'datetime'
     ];
 
     protected $hidden = [
@@ -40,11 +38,30 @@ class Event extends Model
     ];
 
     protected $dates = [
-        'date',
-        'start_time',
-        'end_time',
-        'last_updated_by_provider'
+        'startDateTime',
+        'endDateTime',
+        'lastUpdated'
     ];
+
+    public function setStartDateTimeAttribute($value)
+    {
+        $this->attributes['startDateTime'] = Carbon::parse($value)->toDateTimeString();
+    }
+
+    public function setEndDateTimeAttribute($value)
+    {
+        $this->attributes['endDateTime'] = Carbon::parse($value)->toDateTimeString();
+    }
+
+    public function setLastUpdatedAttribute($value)
+    {
+        $this->attributes['lastUpdated'] = Carbon::parse($value)->toDateTimeString();
+    }
+
+    public function fetch(Mink $mink, $identifier = null)
+    {
+        /* Unable to decouple, no separate API call */
+    }
 
     public function scrape(Mink $mink, $identifier = null, $extra = [])
     {

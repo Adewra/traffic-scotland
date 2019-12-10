@@ -11,12 +11,6 @@ use DMore\ChromeDriver\ChromeDriver;
 class Client
 {
     private $config = [];
-    private $prefixes = [
-        '03c' => 'Current Roadworks',
-        '04p' => 'Planned Roadworks',
-        '03h' => 'Current Roadworks (Highways England)',
-        '04h' => 'Planned Roadworks (Highways England)'
-    ];
     protected $mink;
 
     public function __construct()
@@ -24,20 +18,32 @@ class Client
         $this->config = config('trafficscotland');
         $this->mink = new Mink(array(
             'roadworks' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/')),
+            'incidents' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/')),
             'events' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/'))
         ));
 
         // /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-gpu --headless --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
     }
 
-    public function currentIncidents()
+    public function incidents()
     {
-        if($this->config['functionality']['current_incidents'] !== true)
+        if($this->config['functionality']['incidents'] !== true)
             return;
 
         $incidents = collect();
 
-        if($this->config['collection_methods']['rss_feeds'] === true)
+        if($this->config['collection_methods']['api'] === true)
+        {
+            $browser = $this->mink->getSession('incidents');
+            $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/current-incidents');
+            $currentIncidents = json_decode($browser->getPage()->getText());
+            foreach ($currentIncidents->layer->points as $currentIncident) {
+                $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/current-incidents/' . $currentIncident->pointId);
+                $incident = json_decode($browser->getPage()->getText(), true);
+                $incidents->push($incident);
+            }
+        }
+        else if($this->config['collection_methods']['rss_feeds'] === true)
         {
             $currentIncidentsFeed = Feed::make('https://trafficscotland.org/rss/feeds/currentincidents.aspx');
             $incidents = collect($currentIncidentsFeed->items)->map(function ($item, $key) {
@@ -155,6 +161,24 @@ class Client
             print "Skipping Current Incidents as there is no suitable collection method available.";
         }
 
+        if($this->config['storage'] === true) {
+            foreach ($incidents->all() as $incident) {
+                \DB::beginTransaction();
+                try {
+                    Incident::updateOrCreate(
+                        [
+                            'identifier' => $incident['incidentId'],
+                            'source' => $incident['source'] // Not really required, but in keeping with the design.
+                        ]
+                        , $incident);
+                } catch (\Exception $e) {
+                    \DB::rollback();
+                    throw $e;
+                }
+                \DB::commit();
+            }
+        }
+
         return $incidents;
     }
 
@@ -166,7 +190,33 @@ class Client
 
         $roadworks = collect();
 
-        if($this->config['collection_methods']['rss_feeds'] === true)
+        if($this->config['collection_methods']['api'] === true)
+        {
+            if($current) {
+                $browser = $this->mink->getSession('roadworks');
+                $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/current-roadworks');
+                $currentRoadworks = json_decode($browser->getPage()->getText());
+                foreach ($currentRoadworks->layer->points as $currentRoadwork) {
+                    $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/current-roadworks/' . $currentRoadwork->pointId);
+                    $roadwork = json_decode($browser->getPage()->getText(), true);
+                    $roadwork['description'] = $this->explodeDescription2($roadwork['description'])->toArray();
+                    $roadworks->push($roadwork);
+                }
+            }
+
+            if($planned) {
+                $browser = $this->mink->getSession('roadworks');
+                $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/planned-roadworks');
+                $plannedRoadworks = json_decode($browser->getPage()->getText());
+                foreach ($plannedRoadworks->layer->points as $plannedRoadwork) {
+                    $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/planned-roadworks/' . $plannedRoadwork->pointId);
+                    $roadwork = json_decode($browser->getPage()->getText(), true);
+                    $roadwork['description'] = $this->explodeDescription2($roadwork['description'])->toArray();
+                    $roadworks->push($roadwork);
+                }
+            }
+        }
+        else if($this->config['collection_methods']['rss_feeds'] === true)
         {
             $feeds = collect();
             if($current)
@@ -293,7 +343,6 @@ class Client
                     unset($roadwork['date']);
                     unset($roadwork['prefix']);
                     unset($roadwork['link']);
-                    $roadwork['delayInformation'] = isset($roadwork['delay_information']) ? $roadwork['delay_information'] : ''; unset($roadwork['delay_information']);
 
                     return $roadwork;
 
@@ -306,32 +355,6 @@ class Client
             $roadworks = $roadworks->filter(function($roadwork) {
                 return !empty($roadwork['locationName']);
             });
-        }
-        else if($this->config['collection_methods']['api'] === true)
-        {
-            if($current) {
-                $browser = $this->mink->getSession('roadworks');
-                $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/current-roadworks');
-                $currentRoadworks = json_decode($browser->getPage()->getText());
-                foreach ($currentRoadworks->layer->points as $currentRoadwork) {
-                    $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/current-roadworks/' . $currentRoadwork->pointId);
-                    $roadwork = json_decode($browser->getPage()->getText(), true);
-                    $roadwork['description'] = $this->explodeDescription2($roadwork['description'])->toArray();
-                    $roadworks->push($roadwork);
-                }
-            }
-
-            if($planned) {
-                $browser = $this->mink->getSession('roadworks');
-                $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/planned-roadworks');
-                $plannedRoadworks = json_decode($browser->getPage()->getText());
-                foreach ($plannedRoadworks->layer->points as $plannedRoadwork) {
-                    $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/planned-roadworks/' . $plannedRoadwork->pointId);
-                    $roadwork = json_decode($browser->getPage()->getText(), true);
-                    $roadwork['description'] = $this->explodeDescription2($roadwork['description'])->toArray();
-                    $roadworks->push($roadwork);
-                }
-            }
         }
         else
         {
@@ -367,7 +390,22 @@ class Client
         $events = collect();
         $venues = collect();
 
-        if($this->config['collection_methods']['webpage_scraping'] === true) {
+        if($this->config['collection_methods']['api'] === true)
+        {
+            $browser = $this->mink->getSession('events');
+            $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/planned-events');
+            $currentVenues = json_decode($browser->getPage()->getText());
+            foreach ($currentVenues->layer->points as $currentVenue) {
+                $browser->visit('https://myapi.trafficscotland.org/v2.0/layers/planned-events/' . $currentVenue->pointId);
+                $venue = json_decode($browser->getPage()->getText(), true);
+                foreach ($venue['plannedEvents'] as $plannedEvent) {
+                    $plannedEvent['venueId'] = $venue['venueId'];
+                    $events->push($plannedEvent);
+                }
+                $venues->push($venue);
+            }
+        }
+        else if($this->config['collection_methods']['webpage_scraping'] === true) {
             try {
                 $browser = $this->mink->getSession('events');
                 $browser->visit('https://trafficscotland.org/plannedevents/index.aspx');
@@ -442,7 +480,11 @@ class Client
             foreach ($venues->all() as $venue) {
                 \DB::beginTransaction();
                 try {
-                    $venue->save();
+                    Venue::updateOrCreate(
+                        [
+                            'identifier' => $venue['venueId'],
+                        ]
+                        , $venue);
                 } catch (\Exception $e) {
                     \DB::rollback();
                     throw $e;
@@ -453,7 +495,11 @@ class Client
             foreach ($events->all() as $event) {
                 \DB::beginTransaction();
                 try {
-                    $event->save();
+                    Event::updateOrCreate(
+                        [
+                            'identifier' => $event['plannedEventId'],
+                        ]
+                        , $event);
                 } catch (\Exception $e) {
                     \DB::rollback();
                     throw $e;

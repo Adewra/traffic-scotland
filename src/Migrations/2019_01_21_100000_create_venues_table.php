@@ -11,15 +11,20 @@ class CreateVenuesTable extends Migration
         {
             $t->bigIncrements('id');
             $t->unsignedBigInteger('identifier')->unique();
-            $t->string('name', 255);
-            $t->mediumText('address')->nullable();
+            $t->string('venueName', 255)->nullable();
+            $t->string('address1', 255)->nullable();
+            $t->string('address2', 255)->nullable();
+            $t->string('address3', 255)->nullable();
             $t->string('city', 255);
-            $t->string('postcode', 8);
+            $t->string('postCode', 8);
             $t->string('telephone', 255)->nullable();
-            $t->mediumText('website')->nullable();
-            $t->string('email', 1024)->nullable();
-            $t->unsignedSmallInteger('crowd_capacity')->nullable();
-            $t->mediumText('link');
+            $t->string('webAddress', 1024)->nullable();
+            $t->string('emailAddress', 1024)->nullable();
+            $t->unsignedSmallInteger('venueCapacity')->nullable();
+            $t->unsignedInteger('locationX')->nullable();
+            $t->unsignedInteger('locationY')->nullable();
+            $t->decimal('latitude')->nullable();
+            $t->decimal('longitude')->nullable();
 
             $t->timestamps();
         });
