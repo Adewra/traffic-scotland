@@ -72,19 +72,19 @@ Here is an example (and the default) configuration:
 
 ```php
     'functionality' => [
-            'incidents' => true,
-            'roadworks' => [
-                'current' => true,
-                'planned' => true,
-            ],
+        'incidents' => true,
+        'roadworks' => [
+            'current' => true,
+            'planned' => true,
+        ],
+        'events' => true,
     ],
     'collection_methods' => [
-            'rss_feeds' => false,
-            'webpage_scraping' => false,
-            'api' => true,
-        ],
-    'events' => true,
-    'storage' => true,
+        'api' => true,
+        'rss_feeds' => false,
+        'webpage_scraping' => false,
+    ],
+    'storage' => true
 ```
 
 To run our database migrations that allow for storing of the data:
@@ -143,10 +143,10 @@ Examples
  **Retrieving Current Incidents**
   
   ```php
-    $incidents = TrafficScotland::currentIncidents();
+    $incidents = TrafficScotland::incidents();
   ```
   ```
-    php artisan trafficscotland:currentincidents
+    php artisan trafficscotland:incidents
   ```
   ```
     php artisan tinker
@@ -156,7 +156,7 @@ Examples
   **Retrieving Roadworks**
   
    ```php
-    $roadworks = TrafficScotland::roadworks(true, false);
+    $roadworks = TrafficScotland::roadworks(true, true);
    ```
    ```
     php artisan trafficscotland:roadworks
@@ -165,6 +165,20 @@ Examples
     php artisan tinker
     >>> Adewra\TrafficScotland\Roadwork::all();
    ```
+   
+ **Retrieving Events**
+ 
+  ```php
+   $roadworks = TrafficScotland::events();
+  ```
+  ```
+   php artisan trafficscotland:events
+  ```
+  ```
+   php artisan tinker
+   >>> Adewra\TrafficScotland\Event::all();
+   >>> Adewra\TrafficScotland\Venue::all();
+  ```
    
    Lessons Learned
    -------- 
