@@ -36,8 +36,8 @@ return [
     ],
 
     'collection_methods' => [
-        'rss_feeds' => true,
-        'api' => false,
+        'rss_feeds' => false,
+        'api' => true,
         'webpage_scraping' => false,
     ],
 
