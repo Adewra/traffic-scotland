@@ -8,86 +8,76 @@ use Illuminate\Database\Eloquent\Model;
 
 class Incident extends Model
 {
-    protected $table = 'current_incidents';
+    protected $table = 'incidents';
     protected $primaryKey = 'id';
     protected $increments = true;
 
     protected $fillable = [
-        'title',
-        'description',
-        'link',
-        'latitude',
-        'longitude',
-        'authors',
-        'comments',
+        'identifier',
+        'source',
         'date',
-        'extended_details',
-        'weather_conditions'
-    ];
-
-    protected $casts = [
-        'authors' => 'array',
-        'latitude' => 'float',
-        'longitude' => 'float',
-        'extended_details' => 'array',
-        'weather_conditions' => 'array'
-    ];
-
-    protected $hidden = [
+        'incidentTypeName',
+        'startTime',
+        'endTime',
+        'locationName',
         'description',
+        'directionName',
+        'delay',
+        'cause',
+        'realWorldLocation',
+        'diversion',
+        'expectedDuration',
+        'imageFileName',
+        'imageHeight',
+        'imageWidth',
+        'locationX',
+        'locationY',
+        'title',
+        'routeId',
+        'routeName',
+        'incidentTypeId',
+        'incidentSubTypeId',
+        'incidentSubTypeName',
+        'regionId',
+        'regionName',
+        'lastModified',
+        'incidentPoints',
         'latitude',
         'longitude'
     ];
 
-    protected $appends = [
-        'location'
+    protected $casts = [
+        'incidentPoints' => 'array'
     ];
+
+    protected $hidden = [];
+
+    protected $appends = [];
 
     protected $dates = [
-        'date'
+        'date',
+        'lastModified',
+        'startTime',
+        'endTime'
     ];
-
-    public function extendedDetails()
-    {
-        return $this->hasOne(IncidentInformation::class, 'id','extended_details');
-    }
-
-    public function weatherConditions()
-    {
-        return $this->hasOne(IncidentInformation::class, 'id','weather_conditions');
-    }
 
     public function setDateAttribute($value)
     {
         $this->attributes['date'] = Carbon::parse($value)->toDateString();
     }
 
-    public function getDateAttribute($value)
+    public function setLastModifiedAttribute($value)
     {
-        return $this->attributes['date'];
+        $this->attributes['lastModified'] = Carbon::parse($value)->toDateTimeLocalString();
     }
 
-    public function setLatitudeAttribute($value)
+    public function setStartTimeAttribute($value)
     {
-        $this->attributes['latitude'] = $value;
+        $this->attributes['startTime'] = Carbon::parse($value)->toDateTimeLocalString();
     }
 
-    public function setLongitudeAttribute($value)
+    public function setEndTimeAttribute($value)
     {
-        $this->attributes['longitude'] = $value;
-    }
-
-    public function setLocationAttribute($value)
-    {
-        /*$this->attributes['latitude'] = $value[0];
-        $this->attributes['longitude'] = $value[1];*/
-    }
-
-    public function getLocationAttribute()
-    {
-        if(isset($this->attributes['latitude']) && isset($this->attributes['longitude']))
-            return new Point([$this->latitude, $this->longitude]);
-        else
-            return null;
+        $this->attributes['endTime'] = Carbon::parse($value)->toDateTimeLocalString();
     }
 }

@@ -72,7 +72,7 @@ Here is an example (and the default) configuration:
 
 ```php
     'functionality' => [
-            'current_incidents' => true,
+            'incidents' => true,
             'roadworks' => [
                 'current' => true,
                 'planned' => true,
@@ -116,12 +116,13 @@ Package Features
  
 Minimum Viable Product
 -------- 
-- [x] Current Incidents
+- [x] Incidents
 - [x] Roadworks (Current & Planned)
 - [ ] Traffic Status
 - [ ] Live Traffic Cameras
+- [ ] Queues
 - [ ] Park and Ride
-- [ ] Bridge Wind Restrictions Forecast
+- [ ] Weather Incidents
 - [ ] Police Travel Warnings
 - [ ] Variable Message Signs
 - [ ] Highways England

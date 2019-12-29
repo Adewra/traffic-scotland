@@ -13,15 +13,21 @@ class Venue extends Model
 
     protected $fillable = [
         'identifier',
-        'name',
-        'address',
+        'venueName',
+        'address1',
+        'address2',
+        'address3',
         'city',
-        'postcode',
-        'link',
+        'postCode',
         'telephone',
-        'website',
-        'crowd_capacity'
-        ];
+        'emailAddress',
+        'webAddress',
+        'venueCapacity',
+        'locationX',
+        'locationY',
+        'latitude',
+        'longitude'
+    ];
 
     protected $casts = [
     ];
@@ -34,6 +40,11 @@ class Venue extends Model
 
     protected $dates = [
     ];
+
+    public function fetch(Mink $mink, $identifier = null) : ?Venue
+    {
+
+    }
 
     public function scrape(Mink $mink, $identifier = null) : ?Venue
     {
