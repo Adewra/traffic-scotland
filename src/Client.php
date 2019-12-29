@@ -548,8 +548,12 @@ class Client
         $keysIndexes = $keys->keys()->values();
 
         $x = $keys->mapWithKeys(function ($startingKey, $startingKeyIndex) use ($keysIndexes, $trailingValues) {
-            /* Requires extra package, spatie/laravel-collection-macros */
-            $endingKeyIndex = $keysIndexes->after($startingKeyIndex);
+
+            /* Long winded way of getting the index of the next key to determine the end */
+            $currentKey = $keysIndexes->search($startingKeyIndex, true);
+            $currentOffset = $keysIndexes->keys()->search($currentKey, true);
+            $next = $keysIndexes->slice($currentOffset, 2);
+            $endingKeyIndex = $next->count() < 2 ? $next->last() : null;
 
             $values = $trailingValues->filter(function($value, $key) use ($startingKeyIndex, $endingKeyIndex) {
                 return $key > $startingKeyIndex && ($key < $endingKeyIndex || is_null($endingKeyIndex));

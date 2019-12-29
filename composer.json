@@ -23,7 +23,6 @@
         "arandilopez/laravel-feed-parser": "^0.1.3",
         "behat/mink": "^1.7@dev",
         "dmore/chrome-mink-driver": "^2.0@dev",
-        "spatie/laravel-collection-macros": "v4.3",
         "ext-json": "*"
     },
     "require-dev": {
