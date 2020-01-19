@@ -38,5 +38,15 @@
         "psr-4": {
             "Adewra\\TrafficScotland\\Test\\": "tests/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Adewra\\TrafficScotland\\TrafficScotlandServiceProvider"
+            ],
+            "aliases": {
+                "TrafficScotland": "Adewra\\TrafficScotland\\TrafficScotlandFacade"
+            }
+        }
     }
 }
