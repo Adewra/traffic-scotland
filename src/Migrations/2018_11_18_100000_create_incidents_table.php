@@ -24,7 +24,7 @@ class CreateIncidentsTable extends Migration
             $t->string('delay', 255)->nullable();
             $t->string('cause', 255)->nullable();
             $t->string('realWorldLocation', 255)->nullable(); // Might be the wrong data type here, we shall find out once its been used and recorded
-            $t->string('diversion', 255)->nullable();
+            $t->longText('diversion')->nullable();
             $t->string('expectedDuration', 255)->nullable();
             $t->string('imageFileName', 255)->nullable();
             $t->unsignedInteger('imageHeight');
