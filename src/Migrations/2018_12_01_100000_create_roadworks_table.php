@@ -15,7 +15,7 @@ class CreateRoadworksTable extends Migration
             $t->string('source', 32);
 
             $t->string('locationName', 255);
-            $t->longText('description')->nullable();
+            $t->json('description')->nullable();
             $t->string('whenType')->nullable();
             $t->string('weekDays')->nullable();
             $t->string('extraLocationDetails')->nullable();
