@@ -50,9 +50,9 @@ class Roadwork extends Model
     ];*/
 
     protected $dates = [
-        'date',
-        'start_date',
-        'end_date'
+        'startDateTime',
+        'endDateTime',
+        'weekCommencing'
     ];
 
     public function setDateAttribute($value)
