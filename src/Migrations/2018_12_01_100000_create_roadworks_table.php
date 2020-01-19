@@ -23,7 +23,7 @@ class CreateRoadworksTable extends Migration
             $t->unsignedInteger('locationY')->nullable();
             $t->dateTime('endDateTime')->nullable();
             $t->dateTime('startDateTime')->nullable();
-            $t->dateTime('weekCommencing')->nullable();
+            $t->date('weekCommencing')->nullable();
             $t->string('directionText')->nullable();
             $t->string('pressReleaseText')->nullable();
             $t->decimal('latitude')->nullable();
