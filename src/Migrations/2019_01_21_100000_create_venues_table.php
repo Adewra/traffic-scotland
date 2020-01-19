@@ -20,7 +20,7 @@ class CreateVenuesTable extends Migration
             $t->string('telephone', 255)->nullable();
             $t->string('webAddress', 1024)->nullable();
             $t->string('emailAddress', 1024)->nullable();
-            $t->unsignedSmallInteger('venueCapacity')->nullable();
+            $t->unsignedInteger('venueCapacity')->nullable();
             $t->unsignedInteger('locationX')->nullable();
             $t->unsignedInteger('locationY')->nullable();
             $t->decimal('latitude')->nullable();

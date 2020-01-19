@@ -15,7 +15,7 @@ class CreateEventsTable extends Migration
             $t->dateTime('startDateTime');
             $t->dateTime('endDateTime');
             $t->mediumText('description');
-            $t->smallInteger('historicAttendance')->nullable();
+            $t->unsignedInteger('historicAttendance')->nullable();
             $t->dateTime('lastUpdated');
             $t->boolean('isCancelled');
             $t->boolean('isCurrent');
