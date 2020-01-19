@@ -45,9 +45,9 @@ class Roadwork extends Model
         'longitude'
     ];
 
-    protected $appends = [
+    /*protected $appends = [
         'location'
-    ];
+    ];*/
 
     protected $dates = [
         'date',
