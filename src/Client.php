@@ -5,8 +5,7 @@ namespace Adewra\TrafficScotland;
 use ArandiLopez\Feed\Facades\Feed;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
-use Carbon\Carbon;
-use DMore\ChromeDriver\ChromeDriver;
+use Behat\Mink\Driver\Selenium2Driver;
 
 class Client
 {
@@ -16,13 +15,12 @@ class Client
     public function __construct()
     {
         $this->config = config('trafficscotland');
-        $this->mink = new Mink(array(
-            'roadworks' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/')),
-            'incidents' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/')),
-            'events' => new Session( new ChromeDriver('http://localhost:9222', null, 'https://trafficscotland.org/'))
-        ));
 
-        // /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-gpu --headless --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
+        $this->mink = new Mink(array(
+            'roadworks' => new Session( new Selenium2Driver('firefox')),
+            'incidents' => new Session( new Selenium2Driver('firefox')),
+            'events' => new Session( new Selenium2Driver('firefox'))
+        ));
     }
 
     public function incidents()

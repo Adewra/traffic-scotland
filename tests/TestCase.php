@@ -1,6 +1,6 @@
 <?php
 
-namespace Adewra\TrafficScotland\Test;
+namespace Adewra\TrafficScotland\Tests;
 use Adewra\TrafficScotland\TrafficScotlandFacade;
 use Adewra\TrafficScotland\TrafficScotlandServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;

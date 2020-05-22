@@ -37,7 +37,10 @@ class Roadwork extends Model
         'longitude' => 'float',
         'description' => 'array',
         'affectedWeeks' => 'array',
-        'isOnHomePage' => 'boolean'
+        'isOnHomePage' => 'boolean',
+        'startDateTime' => 'datetime',
+        'endDateTime' => 'datetime',
+        'weekCommencing' => 'datetime'
     ];
 
     protected $hidden = [
@@ -45,18 +48,18 @@ class Roadwork extends Model
         'longitude'
     ];
 
-    /*protected $appends = [
-        'location'
-    ];*/
-
-    protected $dates = [
-        'startDateTime',
-        'endDateTime',
-        'weekCommencing'
-    ];
-
-    public function setDateAttribute($value)
+    public function setStartDateTimeAttribute($value)
     {
-        $this->attributes['date'] = Carbon::parse($value)->toDateString();
+        $this->attributes['startDateTime'] = Carbon::parse($value)->toDateTimeString();
+    }
+
+    public function setEndDateTimeAttribute($value)
+    {
+        $this->attributes['endDateTime'] = Carbon::parse($value)->toDateTimeString();
+    }
+
+    public function setWeekCommencingAttribute($value)
+    {
+        $this->attributes['weekCommencing'] = Carbon::parse($value)->toDateTimeString();
     }
 }
