@@ -5,6 +5,7 @@ namespace Adewra\TrafficScotland;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\Driver\Selenium2Driver;
+use Illuminate\Support\Str;
 
 class Client
 {
@@ -265,7 +266,7 @@ class Client
             })
             ->mapWithKeys(function ($item) {
                 try {
-                    return [snake_case($item[0]) => explode('<br>', $item[1] ?? '')];
+                    return [Str::snake($item[0]) => explode('<br>', $item[1] ?? '')];
                 } catch (\Exception $exception) {
                     return $item[0];
                 }
@@ -303,7 +304,7 @@ class Client
                 return $key > $startingKeyIndex && ($key < $endingKeyIndex || is_null($endingKeyIndex));
             })->values();
 
-            return [snake_case($startingKey) => $values];
+            return [Str::snake($startingKey) => $values];
         });
 
         return $x;
