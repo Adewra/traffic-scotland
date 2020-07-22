@@ -1,11 +1,11 @@
 {
-    "name": "adewra/laravel-traffic-scotland",
+    "name": "adewra/traffic-scotland",
     "description": "Access Traffic Scotland's Current Incidents, Live Traffic Cameras, Unplanned Events, Roadworks, Future Roadworks, Traffic Status, Variable Message Signs and Journey Times.",
     "keywords": ["Scotland", "laravel", "traffic", "bus", "train", "subway", "ferry", "ferries", "roads", "roadworks", "journey times", "variable message signs"],
     "homepage": "https://traffiscotland.adewra.com/",
     "support": {
-        "issues": "https://github.com/adewra/laravel-traffic-scotland/issues",
-        "source": "https://github.com/adewra/laravel-traffic-scotland"
+        "issues": "https://github.com/adewra/traffic-scotland/issues",
+        "source": "https://github.com/adewra/traffic-scotland"
     },
     "license": "MIT",
     "authors": [
@@ -23,6 +23,7 @@
         "illuminate/support": "^7.0",
         "illuminate/database": "^7.0",
         "illuminate/routing": "^7.0",
+        "illuminate/config": "^7.0",
         "behat/mink": "^1.7",
         "behat/mink-selenium2-driver": "^1.4"
     },

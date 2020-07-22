@@ -1,7 +1,9 @@
-Laravel Traffic Scotland
+Traffic Scotland
 ===============
 
 A package for retrieving the latest traffic information in Scotland through [Traffic Scotland](https://trafficscotland.org/).
+
+Designed primarily for the Laravel & Lumen frameworks, you can easily just drop this into any PHP project using Composer.
 
 Table of contents
 -----------------
@@ -20,35 +22,28 @@ Installation
 Installation using composer:
 
 ```
-composer require adewra/trafficscotland
+composer require adewra/traffic-scotland
 ```
 
-### Laravel version Compatibility
+### Laravel/Lumen version compatibility
 
- Laravel  | Package
+ Version  | Status
 :---------|:----------
- 4.2.x    | Untested
- 5.0.x    | Untested
- 5.1.x    | Untested
- 5.2.x    | Untested
- 5.3.x    | Untested
- 5.4.x    | Untested
- 5.5.x    | Untested
- 5.6.x    | Untested
- 5.7.x    | Test Build
+ 4.x.x    | Untested
+ 5.x.x    | Untested
+ 6.x.x    | Untested
+ 7.0      | Test Build
 
-And add the service provider in `config/app.php`:
+For Lumen and Laravel versions earlier than `5.x` you'll also need to add the _service provider_ in `config/app.php`:
 
 ```php
 Adewra\TrafficScotland\TrafficScotlandServiceProvider::class,
 ```
 
-This package hasn't been tested with [Lumen](http://lumen.laravel.com).
-
 Upgrading
 ---------
 
-Package hasn't been baselined yet.
+This package is still in `Pre-release`, upgrade instructions will come when the first update is officially released.
 
 Testing
 -------
@@ -99,43 +94,45 @@ Troubleshooting
 
 Troubleshooting hasn't been written yet.
 
-Package Features
+Package features
 -------------
 
- Type  | Included
-:---------|:----------
+ Type             | Included
+:-----------------|:----------
  Configuration    | Yes
- Views    | No
- Blade Directives    | No
- Commands    | Yes
- Migrations    | Yes
- Translations    | No
- Middleware    | No
- Events   | No
- Seeds    | Yes
+ Views            | No
+ Blade Directives | No
+ Commands         | Yes
+ Migrations       | Yes
+ Translations     | No
+ Middleware       | No
+ Events           | No
+ Seeds            | Yes
  
-Minimum Viable Product
+MVP & potential future functionality
 -------- 
 - [x] Incidents
 - [x] Roadworks (Current & Planned)
-- [ ] Traffic Status
-- [ ] Live Traffic Cameras
+- [x] Events (& Venues)
+- [ ] ~~Status/Congestion~~
+- [ ] Traffic Cameras
 - [ ] Queues
 - [ ] Park and Ride
+- [ ] Bulletins
 - [ ] Weather Incidents
+- [ ] Weather Stations
 - [ ] Police Travel Warnings
 - [ ] Variable Message Signs
 - [ ] Highways England
 - [ ] News
-- [x] Events
 - [ ] Gritters
-- [x] Region Filtering
-- [x] GIS Features
  
 Methods
 --------
 
-RSS Feeds, Web Scraping & JSON API
+The preferred method for obtaining information is through Traffic Scotland's API that is utilised by the mobile version of their website.
+
+Alternative methods include use of Datex II Service, RSS Feeds or through scraping the web pages.
 
 Examples
 -------- 
@@ -183,4 +180,4 @@ Examples
    Lessons Learned
    -------- 
    
-   - I should have realised Goutte wouldn't be able to handle Traffic Scotland's website's javascript based navigation and gone with Selenium 2 from the beginning. Using Behat's Mink I am able to easily switch between both.
+   - My original choice of HTTP client Goutte isn't able to handle Traffic Scotland's website's javascript based navigation and as such, I should have gone with Selenium 2 from the beginning. Using Behat's Mink I am able to easily switch between both.
