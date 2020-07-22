@@ -34,7 +34,7 @@ composer require adewra/traffic-scotland
  6.x.x    | Untested
  7.0      | Test Build
 
-For Lumen and Laravel versions earlier than `5.x` you'll also need to add the _service provider_ in `config/app.php`:
+For Lumen and Laravel versions earlier than `5.5` you'll also need to add the _service provider_ in `config/app.php`:
 
 ```php
 Adewra\TrafficScotland\TrafficScotlandServiceProvider::class,

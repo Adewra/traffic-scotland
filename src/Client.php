@@ -17,9 +17,9 @@ class Client
         $this->config = config('trafficscotland');
 
         $this->mink = new Mink(array(
-            'roadworks' => new Session( new Selenium2Driver('firefox')),
-            'incidents' => new Session( new Selenium2Driver('firefox')),
-            'events' => new Session( new Selenium2Driver('firefox'))
+            'roadworks' => new Session( new Selenium2Driver('firefox', null, $this->config['selenium_webdriver'])),
+            'incidents' => new Session( new Selenium2Driver('firefox', null, $this->config['selenium_webdriver'])),
+            'events' => new Session( new Selenium2Driver('firefox', null, $this->config['selenium_webdriver']))
         ));
     }
 

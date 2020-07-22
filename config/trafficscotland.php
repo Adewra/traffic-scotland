@@ -42,6 +42,7 @@ return [
     ],
 
     'storage' => true,
+    'selenium_webdriver' => 'http://localhost:4444/wd/hub',
 
     /**
      * Limit collection to one or more regions, or all regions by using '*'
