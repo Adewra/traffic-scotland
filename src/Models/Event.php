@@ -5,6 +5,7 @@ namespace Adewra\TrafficScotland;
 use Behat\Mink\Mink;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Event extends Model
 {
@@ -79,7 +80,7 @@ class Event extends Model
                 list($key, $value) = explode(": ", trim(preg_replace('!\s+!', ' ', $node->getText())), 2);
                 return array($key => $value);
             })->mapWithKeys(function ($item) {
-                return [snake_case(key($item)) => $item[key($item)]];
+                return [Str::snake(key($item)) => $item[key($item)]];
             });
 
             if(!isset($eventDetails['name']))
