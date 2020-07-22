@@ -2,7 +2,7 @@
     "name": "adewra/traffic-scotland",
     "description": "Access Traffic Scotland's Current Incidents, Live Traffic Cameras, Unplanned Events, Roadworks, Future Roadworks, Traffic Status, Variable Message Signs and Journey Times.",
     "keywords": ["Scotland", "laravel", "traffic", "bus", "train", "subway", "ferry", "ferries", "roads", "roadworks", "journey times", "variable message signs"],
-    "homepage": "https://traffiscotland.adewra.com/",
+    "homepage": "https://trafficscotland.adewra.com/",
     "support": {
         "issues": "https://github.com/adewra/traffic-scotland/issues",
         "source": "https://github.com/adewra/traffic-scotland"
